@@ -1,4 +1,4 @@
-import type { PNode, PNodeStatus } from '@/types/pnode';
+import type { PNode, PNodeStatus, GeoData } from '@/types/pnode';
 
 // Backend API base URL (Rust Server)
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
@@ -27,6 +27,7 @@ interface Pod {
     uptime?: number;
     version?: string;
     sourceIp?: string;
+    geo?: GeoData;
 }
 
 /**
@@ -88,6 +89,7 @@ class PRPCService {
             discoveredAt: new Date(now - Math.random() * 14 * 24 * 60 * 60 * 1000).toISOString(),
             sessions: [], // Would need historical data for this
             signals: [], // Would need to track anomalies over time
+            geo: pod.geo,
         };
     }
 

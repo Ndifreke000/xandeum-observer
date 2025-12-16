@@ -6,6 +6,7 @@ import { PNodeDetail } from '@/components/PNodeDetail';
 import { prpcService } from '@/services/prpc';
 import { PNode } from '@/types/pnode';
 import { useToast } from '@/hooks/use-toast';
+import GlobeVisualization from '@/components/GlobeVisualization';
 
 const Index = () => {
   const [nodes, setNodes] = useState<PNode[]>([]);
@@ -71,6 +72,10 @@ const Index = () => {
           </div>
 
           <NetworkStats nodes={nodes} />
+
+          <div className="mb-6">
+            <GlobeVisualization nodes={nodes} />
+          </div>
 
           <div>
             <h2 className="text-lg font-medium mb-4">pNode Registry</h2>

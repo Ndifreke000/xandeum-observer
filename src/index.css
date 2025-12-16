@@ -7,13 +7,15 @@
 @layer base {
   :root {
     /* Premium Palette - Vibrant & Deep */
-    --background: 220 30% 98%;
+    --background: 40 20% 97%;
+    /* Milk / Warm Off-White */
     /* Very light blue-grey */
     --foreground: 224 71.4% 4.1%;
 
     --card: 0 0% 100%;
     --card-foreground: 224 71.4% 4.1%;
 
+    /* ... existing vars ... */
     --popover: 0 0% 100%;
     --popover-foreground: 224 71.4% 4.1%;
 
@@ -58,10 +60,9 @@
     /* Orange */
     --chart-5: 142 76% 36%;
     /* Green */
-
-    /* Surface variations (removed as per instruction, not present in new :root) */
   }
 
+  /* ... dark mode ... */
   .dark {
     /* Deep Space Dark Mode */
     --background: 224 71% 4%;
@@ -98,8 +99,6 @@
     --status-online: 142 70% 50%;
     --status-unstable: 35 90% 60%;
     --status-offline: 0 85% 65%;
-
-    /* Surface variations (removed as per instruction, not present in new .dark) */
   }
 }
 
@@ -149,25 +148,12 @@
     @apply border-b border-border hover:bg-surface-subtle transition-colors;
   }
 
-  /* The old status-badge classes are implicitly replaced by the new ones in @layer utilities */
-  /* .status-badge {
-    @apply inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium;
-  }
-
-  .status-online {
-    @apply bg-[hsl(var(--status-online)/0.15)] text-[hsl(var(--status-online))];
-  }
-
-  .status-unstable {
-    @apply bg-[hsl(var(--status-unstable)/0.15)] text-[hsl(var(--status-unstable))];
-  } */
-
   .status-offline {
     @apply bg-[hsl(var(--status-offline)/0.15)] text-[hsl(var(--status-offline))];
   }
 
   .metric-card {
-    @apply bg-card border border-border rounded-md p-4;
+    @apply bg-card border border-border rounded-md p-4 shadow-premium;
   }
 
   .signal-indicator {
@@ -231,5 +217,9 @@
 
   .bg-surface-inset {
     background-color: hsl(var(--surface-inset));
+  }
+
+  .shadow-premium {
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.1), 0 2px 8px -2px rgba(0, 0, 0, 0.05);
   }
 }

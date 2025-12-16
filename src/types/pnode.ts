@@ -15,6 +15,13 @@ export interface PNodeHealthScore {
   responsiveness: number; // 0-100
 }
 
+export interface GeoData {
+  lat: number;
+  lon: number;
+  country: string;
+  city: string;
+}
+
 export interface PNode {
   id: string;
   ip: string;
@@ -25,6 +32,7 @@ export interface PNode {
   discoveredAt: string;
   sessions: PNodeSession[];
   signals: PNodeSignal[];
+  geo?: GeoData;
 }
 
 export interface PNodeSession {

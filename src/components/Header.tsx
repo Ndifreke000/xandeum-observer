@@ -20,7 +20,7 @@ interface HeaderProps {
 export const Header = ({ onRefresh, isLoading, lastUpdated }: HeaderProps) => {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
-  const [isDark, setIsDark] = useState(true); // Default to dark for "deep space" theme
+  const [isDark, setIsDark] = useState(false); // Default to light mode for "milk" theme showcase
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -92,7 +92,7 @@ export const Header = ({ onRefresh, isLoading, lastUpdated }: HeaderProps) => {
   );
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 shadow-sm">
       <div className="container flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-6">
           <Link to="/" className="flex items-center gap-2 group">
