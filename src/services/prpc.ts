@@ -1,7 +1,7 @@
 import type { PNode, PNodeStatus } from '@/types/pnode';
 
-// Backend API base URL
-const API_BASE_URL = 'http://localhost:3001/api';
+// Backend API base URL (Rust Server)
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 // Seed IPs from the pRPC network
 const SEED_IPS = [
@@ -96,7 +96,7 @@ class PRPCService {
      */
     async getAllPNodes(): Promise<PNode[]> {
         try {
-            const response = await fetch(`${API_BASE_URL}/pnodes`);
+            const response = await fetch(`${API_BASE_URL}/pods`);
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -104,13 +104,14 @@ class PRPCService {
 
             const data = await response.json();
 
-            if (!data.success) {
+            if (data.error) {
                 throw new Error(data.error || 'Failed to fetch pNodes');
             }
 
             // Convert all pods to PNodes
-            const pNodes = data.pods.map((pod: Pod) => this.convertPodToPNode(pod));
-            console.log(`✓ Fetched ${pNodes.length} pNodes from backend`);
+            // Rust returns { total_count, pods: [...] }
+            const pNodes = (data.pods || []).map((pod: Pod) => this.convertPodToPNode(pod));
+            console.log(`✓ Fetched ${pNodes.length} pNodes from Rust backend`);
 
             return pNodes;
         } catch (error) {
@@ -121,26 +122,11 @@ class PRPCService {
 
     /**
      * Get stats for a specific node
+     * Note: Rust backend currently doesn't expose direct IP stats, using findPNode logic or returning null
      */
     async getNodeStats(ip: string): Promise<any | null> {
-        try {
-            const response = await fetch(`${API_BASE_URL}/pnode/${ip}/stats`);
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-
-            if (!data.success) {
-                throw new Error(data.error || 'Failed to fetch node stats');
-            }
-
-            return data.stats;
-        } catch (error) {
-            console.error(`Failed to get stats for ${ip}:`, error);
-            return null;
-        }
+        // Not implemented in Rust backend yet
+        return null;
     }
 
     /**
@@ -148,13 +134,7 @@ class PRPCService {
      */
     async findPNode(pubkey: string): Promise<PNode | null> {
         try {
-            const response = await fetch(`${API_BASE_URL}/pnode/find`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ pubkey }),
-            });
+            const response = await fetch(`${API_BASE_URL}/node/${pubkey}`);
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -162,11 +142,11 @@ class PRPCService {
 
             const data = await response.json();
 
-            if (!data.success) {
+            if (data.error) {
                 throw new Error(data.error || 'pNode not found');
             }
 
-            return this.convertPodToPNode(data.pod);
+            return this.convertPodToPNode(data);
         } catch (error) {
             console.error(`Failed to find pNode ${pubkey}:`, error);
             return null;
