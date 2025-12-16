@@ -54,7 +54,7 @@ export const NetworkStats = ({ nodes }: NetworkStatsProps) => {
       value: `${avgHealth}%`,
       icon: Heart,
       color: 'text-purple-500',
-      subtext: 'Network Score',
+      subtext: '',
       bg: 'bg-purple-500/10',
     },
   ];
@@ -62,18 +62,18 @@ export const NetworkStats = ({ nodes }: NetworkStatsProps) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
       {stats.map((stat) => (
-        <Card key={stat.label} className="glass-card border-0 overflow-hidden relative group">
+        <Card key={stat.label} className="border border-border/50 shadow-premium overflow-hidden relative group bg-card hover:shadow-lg transition-all duration-300">
           <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-transparent via-transparent to-${stat.color.split('-')[1]}-500/5`} />
-          <CardContent className="p-6 flex flex-col justify-between h-full relative z-10">
-            <div className="flex items-center justify-between mb-4">
+          <CardContent className="p-5 flex flex-col justify-between h-full relative z-10">
+            <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-muted-foreground">{stat.label}</span>
-              <div className={`p-2 rounded-lg ${stat.bg}`}>
+              <div className={`p-1.5 rounded-lg ${stat.bg}`}>
                 <stat.icon className={`h-4 w-4 ${stat.color}`} />
               </div>
             </div>
             <div>
               <div className="text-2xl font-bold tracking-tight">{stat.value}</div>
-              <p className="text-xs text-muted-foreground mt-1">{stat.subtext}</p>
+              {stat.subtext && <p className="text-xs text-muted-foreground mt-1">{stat.subtext}</p>}
             </div>
           </CardContent>
         </Card>

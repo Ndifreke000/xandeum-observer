@@ -65,10 +65,7 @@ const Index = () => {
       <main className="flex-1 flex">
         <div className={`flex-1 p-6 space-y-6 transition-all ${selectedNode ? 'mr-[480px]' : ''}`}>
           <div>
-            <h1 className="text-xl font-semibold mb-1">Network Overview</h1>
-            <p className="text-sm text-muted-foreground">
-              Real-time pNode discovery and monitoring via pRPC v0.7.0
-            </p>
+            <h1 className="text-xl font-semibold mb-6">Network Overview</h1>
           </div>
 
           <NetworkStats nodes={nodes} />
@@ -77,7 +74,7 @@ const Index = () => {
             <GlobeVisualization nodes={nodes} />
           </div>
 
-          <div>
+          <div className="border-t-2 border-border/60 pt-6">
             <h2 className="text-lg font-medium mb-4">pNode Registry</h2>
             <PNodeTable
               nodes={nodes}

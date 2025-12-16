@@ -3,7 +3,7 @@ use axum::{
     routing::get,
     Json, Router,
 };
-use std::net::SocketAddr;
+use std::sync::Arc;
 use tower_http::cors::CorsLayer;
 use xandeum_prpc::{PrpcClient, find_pnode};
 use serde::{Serialize, Deserialize};

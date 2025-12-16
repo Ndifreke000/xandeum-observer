@@ -93,7 +93,8 @@ export const Header = ({ onRefresh, isLoading, lastUpdated }: HeaderProps) => {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 shadow-sm">
-      <div className="container flex h-16 items-center justify-between px-4">
+      <div className="w-full flex h-16 items-center justify-between px-6">
+        {/* Left: Logo */}
         <div className="flex items-center gap-6">
           <Link to="/" className="flex items-center gap-2 group">
             <div className="relative flex h-8 w-8 items-center justify-center">
@@ -108,8 +109,11 @@ export const Header = ({ onRefresh, isLoading, lastUpdated }: HeaderProps) => {
               </span>
             </div>
           </Link>
+        </div>
 
-          <nav className="hidden md:flex items-center gap-2">
+        {/* Center: Navigation & Search */}
+        <div className="hidden md:flex flex-1 items-center justify-center gap-6 px-4">
+          <nav className="flex items-center gap-1">
             <Link to="/">
               <Button variant={isActive('/') ? "secondary" : "ghost"} size="sm" className="gap-2">
                 <Network className="w-4 h-4" />
@@ -123,7 +127,7 @@ export const Header = ({ onRefresh, isLoading, lastUpdated }: HeaderProps) => {
                   Contracts
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-48">
+              <DropdownMenuContent align="center" className="w-48">
                 <Link to="/contracts/eda">
                   <DropdownMenuItem className="cursor-pointer">
                     Contract EDA
@@ -137,15 +141,12 @@ export const Header = ({ onRefresh, isLoading, lastUpdated }: HeaderProps) => {
               </DropdownMenuContent>
             </DropdownMenu>
           </nav>
-        </div>
 
-        {/* Center Search Bar */}
-        <div className="hidden lg:flex flex-1 max-w-md mx-4">
-          <div className="relative w-full">
+          <div className="relative w-full max-w-xs lg:max-w-sm">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Search pNodes, contracts, or transactions..."
+              placeholder="Search..."
               className="w-full bg-background/50 pl-9 h-9 focus-visible:ring-1"
             />
           </div>
