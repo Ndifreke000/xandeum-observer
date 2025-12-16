@@ -67,19 +67,19 @@ export default function ContractEDA() {
         <div className="min-h-screen flex flex-col bg-background">
             {/* Header */}
             <header className="sticky top-0 z-50 border-b border-border bg-card/80 backdrop-blur-sm">
-                <div className="container mx-auto px-6 py-4">
+                <div className="w-full px-6 py-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
                             <Button
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => navigate('/')}
-                                className="gap-2"
+                                className="gap-2 -ml-2"
                             >
                                 <ArrowLeft className="h-4 w-4" />
                                 Back
                             </Button>
-                            <div>
+                            <div className="hidden sm:block">
                                 <h1 className="text-xl font-semibold">Contract EDA</h1>
                                 <p className="text-sm text-muted-foreground">
                                     Exploratory Data Analysis for Smart Contracts
@@ -89,19 +89,20 @@ export default function ContractEDA() {
                         {lastUpdated && (
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                 <Clock className="h-4 w-4" />
-                                <span>Updated {new Date(lastUpdated).toLocaleTimeString()}</span>
+                                <span className="hidden sm:inline">Updated {new Date(lastUpdated).toLocaleTimeString()}</span>
+                                <span className="sm:hidden">{new Date(lastUpdated).toLocaleTimeString()}</span>
                             </div>
                         )}
                     </div>
                 </div>
             </header>
 
-            <main className="flex-1 container mx-auto px-6 py-6 space-y-6">
+            <main className="flex-1 w-full px-6 py-6 space-y-6">
                 {/* Search & Controls */}
                 <Card className="p-6">
                     <div className="space-y-4">
                         {/* Search Input */}
-                        <div className="flex gap-2">
+                        <div className="flex flex-col sm:flex-row gap-2">
                             <div className="flex-1">
                                 <Input
                                     placeholder="Enter contract address (44-character base58)..."
@@ -113,25 +114,27 @@ export default function ContractEDA() {
                                     className="font-mono"
                                 />
                             </div>
-                            <Button
-                                onClick={handleSearch}
-                                disabled={isLoading || !contractAddress.trim()}
-                                className="gap-2"
-                            >
-                                <Search className="h-4 w-4" />
-                                Analyze
-                            </Button>
-                            {analysis && (
+                            <div className="flex gap-2">
                                 <Button
-                                    variant="outline"
-                                    onClick={handleRefresh}
-                                    disabled={isLoading}
-                                    className="gap-2"
+                                    onClick={handleSearch}
+                                    disabled={isLoading || !contractAddress.trim()}
+                                    className="gap-2 flex-1 sm:flex-none"
                                 >
-                                    <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-                                    Refresh
+                                    <Search className="h-4 w-4" />
+                                    Analyze
                                 </Button>
-                            )}
+                                {analysis && (
+                                    <Button
+                                        variant="outline"
+                                        onClick={handleRefresh}
+                                        disabled={isLoading}
+                                        className="gap-2 flex-1 sm:flex-none"
+                                    >
+                                        <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                                        Refresh
+                                    </Button>
+                                )}
+                            </div>
                         </div>
 
                         {/* Auto-Refresh Controls */}

@@ -8,9 +8,15 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { ArrowUpDown, Search, Bookmark, Wifi, WifiOff, Activity, Server, Clock, Copy } from 'lucide-react';
+import { ArrowUpDown, Search, Bookmark, Wifi, WifiOff, Activity, Server, Clock, Copy, Download } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface PNodeTableProps {
   nodes: PNode[];
@@ -35,6 +41,46 @@ export function PNodeTable({ nodes, onSelectNode, selectedNodeId }: PNodeTablePr
       title: "Copied ID",
       description: "pNode ID copied to clipboard",
       duration: 2000,
+    });
+  };
+
+  const handleExport = (format: 'csv' | 'json') => {
+    const data = filteredAndSorted;
+    let content = '';
+    let filename = `pnodes_export_${new Date().toISOString().split('T')[0]}`;
+
+    if (format === 'json') {
+      content = JSON.stringify(data, null, 2);
+      filename += '.json';
+    } else {
+      // CSV
+      const headers = ['ID', 'IP', 'Status', 'Uptime', 'Latency', 'Health', 'Last Seen'];
+      const rows = data.map(n => [
+        n.id,
+        n.ip,
+        n.status,
+        n.metrics.uptime,
+        n.metrics.latency,
+        n.health.total,
+        n.metrics.lastSeen
+      ]);
+      content = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      filename += '.csv';
+    }
+
+    const blob = new Blob([content], { type: format === 'json' ? 'application/json' : 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: "Export Successful",
+      description: `Exported ${data.length} nodes to ${filename}`,
     });
   };
 
@@ -135,6 +181,23 @@ export function PNodeTable({ nodes, onSelectNode, selectedNodeId }: PNodeTablePr
               <SelectItem value="offline">Offline</SelectItem>
             </SelectContent>
           </Select>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon" title="Export Data">
+                <Download className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => handleExport('csv')}>
+                Export as CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExport('json')}>
+                Export as JSON
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <span className="text-sm text-muted-foreground whitespace-nowrap">
             {filteredAndSorted.length} of {nodes.length} nodes
           </span>
@@ -158,7 +221,7 @@ export function PNodeTable({ nodes, onSelectNode, selectedNodeId }: PNodeTablePr
                 <div
                   key={node.id}
                   onClick={() => onSelectNode(node)}
-                  className={`grid grid-cols-12 gap-4 p-4 items-center hover:bg-muted/50 cursor-pointer transition-colors text-sm group ${selectedNodeId === node.id ? 'bg-primary/5 border-l-2 border-l-primary' : 'border-l-2 border-l-transparent'
+                  className={`grid grid-cols-12 gap-4 p-4 items-center hover:bg-accent/50 hover:shadow-sm cursor-pointer transition-all duration-200 text-sm group ${selectedNodeId === node.id ? 'bg-primary/5 border-l-2 border-l-primary' : 'border-l-2 border-l-transparent'
                     }`}
                 >
                   <div className="col-span-4 font-mono text-xs flex items-center gap-2 truncate pl-2">

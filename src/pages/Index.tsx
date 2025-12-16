@@ -7,6 +7,7 @@ import { prpcService } from '@/services/prpc';
 import { PNode } from '@/types/pnode';
 import { useToast } from '@/hooks/use-toast';
 import GlobeVisualization from '@/components/GlobeVisualization';
+import { HistoricalCharts } from '@/components/HistoricalCharts';
 
 const Index = () => {
   const [nodes, setNodes] = useState<PNode[]>([]);
@@ -42,8 +43,11 @@ const Index = () => {
   }, [toast]);
 
   // Initial fetch on mount
+  // Initial fetch on mount and interval
   useEffect(() => {
     fetchPNodes();
+    const interval = setInterval(fetchPNodes, 10000); // 10 seconds refresh
+    return () => clearInterval(interval);
   }, [fetchPNodes]);
 
   const handleRefresh = useCallback(() => {
@@ -69,6 +73,8 @@ const Index = () => {
           </div>
 
           <NetworkStats nodes={nodes} />
+
+          <HistoricalCharts />
 
           <div className="mb-6">
             <GlobeVisualization nodes={nodes} />

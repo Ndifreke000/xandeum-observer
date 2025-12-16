@@ -3,20 +3,36 @@ use axum::{
     routing::get,
     Json, Router,
 };
-use std::sync::Arc;
 use tower_http::cors::CorsLayer;
 use xandeum_prpc::{PrpcClient, find_pnode};
 use serde::{Serialize, Deserialize};
 use once_cell::sync::Lazy;
 use dashmap::DashMap;
+use std::collections::VecDeque;
+use std::sync::{Arc, RwLock};
+use std::time::{SystemTime, UNIX_EPOCH};
 
 static GEO_CACHE: Lazy<DashMap<String, GeoData>> = Lazy::new(|| DashMap::new());
 
+static HISTORY: Lazy<Arc<RwLock<VecDeque<HistorySnapshot>>>> = Lazy::new(|| {
+    Arc::new(RwLock::new(VecDeque::with_capacity(1440))) // 24 hours * 60 mins
+});
+
 #[tokio::main]
 async fn main() {
+    // Spawn background task for history snapshots
+    tokio::spawn(async move {
+        let mut interval = tokio::time::interval(std::time::Duration::from_secs(60));
+        loop {
+            interval.tick().await;
+            capture_snapshot().await;
+        }
+    });
+
     let app = Router::new()
         .route("/pods", get(get_pods))
         .route("/node/{id}", get(get_node))
+        .route("/history", get(get_history))
         .layer(CorsLayer::permissive());
 
     let port = std::env::var("PORT").unwrap_or_else(|_| "3001".to_string());
@@ -33,6 +49,14 @@ struct GeoData {
     lon: f64,
     country: String,
     city: String,
+}
+
+#[derive(Clone, Serialize, Debug)]
+struct HistorySnapshot {
+    timestamp: u64,
+    total_nodes: u32,
+    online_nodes: u32,
+    total_storage: u64,
 }
 
 #[derive(Serialize)]
@@ -73,6 +97,37 @@ async fn fetch_geo(ip: String) {
         }
         Err(_) => {}
     }
+}
+
+async fn capture_snapshot() {
+    let client = PrpcClient::new("173.212.220.65", None);
+    if let Ok(pods) = client.get_pods_with_stats().await {
+        let total = pods.total_count;
+        // Count online nodes (uptime > 0)
+        let online = pods.pods.iter().filter(|p| p.uptime.unwrap_or(0) > 0).count() as u32;
+        // Sum storage
+        let storage: u64 = pods.pods.iter().map(|p| p.storage_used.unwrap_or(0) as u64).sum();
+
+        let snapshot = HistorySnapshot {
+            timestamp: SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs(),
+            total_nodes: total,
+            online_nodes: online,
+            total_storage: storage,
+        };
+        
+        let history = HISTORY.clone();
+        if let Ok(mut history) = history.write() {
+            if history.len() >= 1440 {
+                history.pop_front();
+            }
+            history.push_back(snapshot);
+        }
+    }
+}
+
+async fn get_history() -> Json<Vec<HistorySnapshot>> {
+    let history = HISTORY.read().unwrap();
+    Json(history.iter().cloned().collect())
 }
 
 async fn get_pods() -> Json<serde_json::Value> {

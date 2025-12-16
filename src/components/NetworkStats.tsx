@@ -62,7 +62,7 @@ export const NetworkStats = ({ nodes }: NetworkStatsProps) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
       {stats.map((stat) => (
-        <Card key={stat.label} className="border border-border/50 shadow-premium overflow-hidden relative group bg-card hover:shadow-lg transition-all duration-300">
+        <Card key={stat.label} className="border border-border/50 shadow-premium overflow-hidden relative group bg-card hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-default">
           <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-transparent via-transparent to-${stat.color.split('-')[1]}-500/5`} />
           <CardContent className="p-5 flex flex-col justify-between h-full relative z-10">
             <div className="flex items-center justify-between mb-2">

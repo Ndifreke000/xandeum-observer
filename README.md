@@ -1,73 +1,84 @@
-# Welcome to your Lovable project
+# Xandeum Network Observer
 
-## Project info
+A world-class, real-time analytics platform for the Xandeum storage network. This dashboard provides deep insights into pNode performance, network health, and geographic distribution.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+![Xandeum Observer](https://raw.githubusercontent.com/xandeum/xandeum-observer/main/public/screenshot.png)
 
-## How can I edit this code?
+## 🚀 Features
 
-There are several ways of editing your application.
+*   **Real-Time Monitoring**: Live updates every 10 seconds via pRPC.
+*   **Geospatial Visualization**: Interactive 3D Globe showing physical node distribution.
+*   **Historical Analytics**: 24-hour history of network growth and storage capacity.
+*   **Advanced Metrics**: Latency, Uptime, and Health Scores for every node.
+*   **Contract EDA**: Exploratory Data Analysis for smart contracts (Coming Soon).
+*   **Data Export**: Download node data as CSV or JSON.
+*   **Premium UI**: "Milk" theme with glassmorphism and responsive design.
 
-**Use Lovable**
+## 🛠️ Tech Stack
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+*   **Frontend**: React, TypeScript, Vite, TailwindCSS, Shadcn/UI, Recharts, React Globe GL.
+*   **Backend**: Rust (Axum, Tokio), In-Memory History, IP Geolocation.
+*   **Communication**: pRPC (Xandeum's custom RPC protocol).
 
-Changes made via Lovable will be committed automatically to this repo.
+## ⚡ Quick Start
 
-**Use your preferred IDE**
+### Prerequisites
+*   Node.js 18+
+*   Rust (latest stable)
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### 1. Backend (Rust)
+The backend handles pRPC connections, geolocation, and historical data aggregation.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+```bash
+cd server-rust
+cargo run --release
+```
+*Server runs on port 3001.*
 
-Follow these steps:
+### 2. Frontend (React)
+The frontend connects to the Rust backend for data.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+```bash
+# Install dependencies
+npm install
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
 ```
+*Frontend runs on port 8080.*
 
-**Edit a file directly in GitHub**
+## 🌍 Deployment
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Backend (Render Web Service)
+1.  Create a **Web Service** on Render.
+2.  Connect your repo.
+3.  **Runtime**: Rust.
+4.  **Root Directory**: `server-rust`.
+5.  **Build Command**: `cargo build --release`.
+6.  **Start Command**: `cargo run --release`.
 
-**Use GitHub Codespaces**
+### Frontend (Vercel/Render Static Site)
+1.  Create a **Static Site**.
+2.  **Build Command**: `npm run build`.
+3.  **Publish Directory**: `dist`.
+4.  **Environment Variables**:
+    *   `VITE_API_URL`: URL of your deployed Rust backend (e.g., `https://your-rust-app.onrender.com`).
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 📊 Architecture
 
-## What technologies are used for this project?
+```mermaid
+graph TD
+    A[User Browser] -->|HTTP/WebSocket| B[React Frontend]
+    B -->|REST API| C[Rust Backend]
+    C -->|pRPC| D[Xandeum Network]
+    C -->|HTTP| E[IP Geolocation API]
+    C -->|In-Memory| F[Historical Data Store]
+```
 
-This project is built with:
+## 🏆 Hackathon Notes
+*   **Real Data Only**: No mock data is used. All stats come directly from the Xandeum network.
+*   **Performance**: Rust backend ensures sub-millisecond response times for cached data.
+*   **Design**: Focused on "World Class" aesthetics with a clean, professional look.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+---
+Built with ❤️ for the Xandeum Hackathon.
