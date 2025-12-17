@@ -166,9 +166,9 @@ export const Header = ({ onRefresh, isLoading, lastUpdated }: HeaderProps) => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="center" className="w-48">
-                <Link to="/nodes/eda">
+                <Link to="/nodes/inspector">
                   <DropdownMenuItem className="cursor-pointer">
-                    Block Nodes EDA
+                    Node Inspector
                   </DropdownMenuItem>
                 </Link>
                 <Link to="/nodes/data-flow">

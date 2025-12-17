@@ -102,6 +102,11 @@ export interface NodeAnalysis {
     traffic?: TrafficDistribution;
     io?: IOBehavior;
     peerProfile?: PeerInteractionProfile;
-    performance?: PerformanceSignals;
+    performance: PerformanceSignals;
+    storage?: {
+        used: number;
+        committed: number;
+        usagePercent: number;
+    };
     generatedAt: string;
 }

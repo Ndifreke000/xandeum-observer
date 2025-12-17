@@ -85,8 +85,11 @@ export function useNodeAnalysis(initialNodeId?: string): UseNodeAnalysisResult {
                         performanceTier: realNode.health?.total > 80 ? 'excellent' : realNode.health?.total > 50 ? 'good' : 'poor',
                         latencyDistribution: latencyDistribution
                     },
-                    // We still don't have real traffic/IO data, so we leave them undefined to show "No Data"
-                    // or we could map pings to traffic if we wanted to be "creative" but honest is better.
+                    storage: realNode.storage ? {
+                        used: realNode.storage.used,
+                        committed: realNode.storage.committed,
+                        usagePercent: realNode.storage.usagePercent
+                    } : undefined
                 };
                 setAnalysis(realAnalysis);
             } else {

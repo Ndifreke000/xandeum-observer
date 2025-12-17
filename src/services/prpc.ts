@@ -224,12 +224,13 @@ class PRPCService {
             const data = await response.json();
 
             if (data.error) {
-                throw new Error(data.error || 'pNode not found');
+                console.warn(`Node not found: ${pubkey}`);
+                return null;
             }
 
             return this.convertPodToPNode(data, 0);
         } catch (error) {
-            console.error(`Failed to find pNode ${pubkey}:`, error);
+            console.error('Error finding pNode:', error);
             return null;
         }
     }

@@ -14,11 +14,9 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useNodeAnalysis } from '@/hooks/useNodeAnalysis';
 import { NodeIdentity } from '@/components/NodeIdentity';
-import { TrafficDistribution } from '@/components/TrafficDistribution';
-import { IOBehavior } from '@/components/IOBehavior';
-import { PeerInteractionProfile } from '@/components/PeerInteractionProfile';
+import { StorageAnalysis } from '@/components/StorageAnalysis';
 import { NodePerformanceSignals } from '@/components/NodePerformanceSignals';
-import { Search, RefreshCw, Clock, ArrowLeft, Check, ChevronsUpDown } from 'lucide-react';
+import { Search, RefreshCw, Clock, ArrowLeft, Check, ChevronsUpDown, FileCode } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { prpcService } from '@/services/prpc';
 import { PNode } from '@/types/pnode';
@@ -216,19 +214,29 @@ export default function BlockNodeEDA() {
 
                         {/* Main Grid */}
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <TrafficDistribution analysis={analysis} />
-                            <IOBehavior analysis={analysis} />
+                            <NodePerformanceSignals analysis={analysis} />
+                            {analysis.storage && (
+                                <StorageAnalysis analysis={analysis} storage={analysis.storage} />
+                            )}
                         </div>
 
-                        {/* Secondary Grid */}
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            <div className="lg:col-span-2">
-                                <PeerInteractionProfile analysis={analysis} />
+                        {/* Raw Data Inspector (Honest Deep Dive) */}
+                        <Card className="p-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <h2 className="text-lg font-semibold flex items-center gap-2">
+                                    <FileCode className="h-5 w-5 text-muted-foreground" />
+                                    Raw Node Data
+                                </h2>
+                                <span className="text-xs text-muted-foreground font-mono">
+                                    Direct from pRPC
+                                </span>
                             </div>
-                            <div>
-                                <NodePerformanceSignals analysis={analysis} />
+                            <div className="bg-muted/50 rounded-lg p-4 overflow-x-auto max-h-[300px] custom-scrollbar">
+                                <pre className="text-xs font-mono text-muted-foreground">
+                                    {JSON.stringify(analysis, null, 2)}
+                                </pre>
                             </div>
-                        </div>
+                        </Card>
                     </div>
                 )}
 

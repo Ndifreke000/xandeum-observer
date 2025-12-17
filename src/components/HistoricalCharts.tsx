@@ -47,7 +47,7 @@ export function HistoricalCharts() {
         };
 
         fetchData();
-        const interval = setInterval(fetchData, 60000); // Update every minute
+        const interval = setInterval(fetchData, 10000); // Update every 10 seconds
         return () => clearInterval(interval);
     }, []);
 

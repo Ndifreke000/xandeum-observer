@@ -302,7 +302,7 @@ async fn get_node(Path(id): Path<String>) -> impl IntoResponse {
     // For simplicity/speed, let's just fetch all and find one (not efficient but works for small scale)
     match db::get_all_nodes().await {
         Ok(nodes) => {
-            if let Some(n) = nodes.into_iter().find(|n| n.pubkey == id || n.ip.contains(&id)) {
+            if let Some(n) = nodes.into_iter().find(|n| n.pubkey == id || n.ip.contains(&id) || n.pubkey.to_lowercase() == id.to_lowercase()) {
                  let geo = if n.lat.is_some() {
                         Some(GeoData {
                             lat: n.lat.unwrap_or(0.0),
