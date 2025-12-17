@@ -28,25 +28,62 @@ interface Pod {
     version?: string;
     sourceIp?: string;
     geo?: GeoData;
+    latency_ms?: number;
+}
+
+interface CreditsData {
+    pubkey: string;
+    credits: number;
 }
 
 /**
  * Service for interacting with Xandeum pRPC network via backend API
  */
 class PRPCService {
+    private creditsCache: Map<string, number> = new Map();
+    private lastCreditsFetch: number = 0;
+
+    /**
+     * Fetch credits from backend proxy
+     */
+    private async fetchCredits(): Promise<void> {
+        const now = Date.now();
+        if (now - this.lastCreditsFetch < 60000) { // Cache for 1 minute
+            return;
+        }
+
+        try {
+            // Use local proxy to avoid CORS
+            const response = await fetch(`${API_BASE_URL}/credits`);
+            if (response.ok) {
+                const data: CreditsData[] = await response.json();
+                this.creditsCache.clear();
+                if (Array.isArray(data)) {
+                    data.forEach(item => {
+                        this.creditsCache.set(item.pubkey, item.credits);
+                    });
+                }
+                this.lastCreditsFetch = now;
+            }
+        } catch (error) {
+            console.error('Failed to fetch credits:', error);
+        }
+    }
+
     /**
      * Convert backend Pod to our PNode format
      */
-    private convertPodToPNode(pod: Pod): PNode {
+    private convertPodToPNode(pod: Pod, rank: number): PNode {
         const now = Date.now();
-        const lastSeen = pod.last_seen_timestamp || now;
+        const lastSeen = pod.last_seen_timestamp ? pod.last_seen_timestamp * 1000 : now;
+
         const timeSinceLastSeen = now - lastSeen;
 
         // Determine status based on last_seen_timestamp
         let status: PNodeStatus;
-        if (timeSinceLastSeen < 60000) { // Less than 1 minute
+        if (timeSinceLastSeen < 120000) { // Less than 2 minutes (relaxed)
             status = 'online';
-        } else if (timeSinceLastSeen < 300000) { // Less than 5 minutes
+        } else if (timeSinceLastSeen < 600000) { // Less than 10 minutes
             status = 'unstable';
         } else {
             status = 'offline';
@@ -56,28 +93,38 @@ class PRPCService {
         const uptimeSeconds = pod.uptime || 0;
         const uptimePercentage = Math.min(100, (uptimeSeconds / (7 * 24 * 60 * 60)) * 100); // As percentage of 7 days
 
-        // Health score calculation
+        const latency = pod.latency_ms || 0;
+
+        // Health score calculation based on REAL metrics
+        // Availability: Uptime
+        // Responsiveness: Latency (lower is better)
+        // Stability: Status
+
         const availability = uptimePercentage;
-        const stability = status === 'online' ? 90 + Math.random() * 10 :
-            status === 'unstable' ? 50 + Math.random() * 30 :
-                Math.random() * 30;
-        const responsiveness = status === 'online' ? 80 + Math.random() * 20 :
-            status === 'unstable' ? 40 + Math.random() * 40 :
-                0;
+
+        // Responsiveness score: 0-100
+        // < 100ms = 100
+        // > 1000ms = 0
+        const responsiveness = latency > 0
+            ? Math.max(0, 100 - (latency / 10))
+            : 0;
+
+        const stability = status === 'online' ? 100 :
+            status === 'unstable' ? 50 : 0;
+
+        const pubkey = pod.pubkey || `pod_${pod.address || 'unknown'}`;
+        const credits = this.creditsCache.get(pubkey) || 0;
 
         return {
-            id: pod.pubkey || `pod_${pod.address}`,
+            id: pubkey,
             ip: pod.address || pod.sourceIp || 'unknown',
             status,
             metrics: {
-                latency: status === 'online' ? 20 + Math.random() * 80 :
-                    status === 'unstable' ? 150 + Math.random() * 350 : 0,
+                latency: latency,
                 uptime: uptimePercentage,
                 lastSeen: new Date(lastSeen).toISOString(),
-                responseTime: status === 'online' ? 15 + Math.random() * 50 :
-                    status === 'unstable' ? 100 + Math.random() * 200 : 0,
-                gossipParticipation: status === 'online' ? 90 + Math.random() * 10 :
-                    status === 'unstable' ? 50 + Math.random() * 30 : 0,
+                responseTime: latency, // Use latency as response time
+                gossipParticipation: status === 'online' ? 100 : 0, // Placeholder until we have real gossip data
             },
             health: {
                 availability: Math.round(availability),
@@ -85,10 +132,19 @@ class PRPCService {
                 responsiveness: Math.round(responsiveness),
                 total: Math.round((availability * 0.4 + stability * 0.35 + responsiveness * 0.25)),
             },
-            isSeed: SEED_IPS.includes(pod.address || ''),
-            discoveredAt: new Date(now - Math.random() * 14 * 24 * 60 * 60 * 1000).toISOString(),
-            sessions: [], // Would need historical data for this
-            signals: [], // Would need to track anomalies over time
+            storage: {
+                used: pod.storage_used || 0,
+                committed: pod.storage_committed || 0,
+                usagePercent: pod.storage_usage_percent || 0,
+            },
+            version: pod.version,
+            credits,
+            rank,
+            isPublic: pod.is_public,
+            isSeed: SEED_IPS.includes((pod.address || '').split(':')[0]),
+            discoveredAt: new Date(now).toISOString(), // We don't have historical discovery time yet
+            sessions: [],
+            signals: [],
             geo: pod.geo,
         };
     }
@@ -98,6 +154,8 @@ class PRPCService {
      */
     async getAllPNodes(): Promise<PNode[]> {
         try {
+            await this.fetchCredits();
+
             const response = await fetch(`${API_BASE_URL}/pods`);
 
             if (!response.ok) {
@@ -111,8 +169,30 @@ class PRPCService {
             }
 
             // Convert all pods to PNodes
-            // Rust returns { total_count, pods: [...] }
-            const pNodes = (data.pods || []).map((pod: Pod) => this.convertPodToPNode(pod));
+            let pNodes = (data.pods || []).map((pod: Pod) => {
+                // Temporary rank placeholder, will sort later
+                return this.convertPodToPNode(pod, 0);
+            });
+
+            // Deduplicate nodes based on ID
+            const seenIds = new Set();
+            pNodes = pNodes.filter((node: PNode) => {
+                if (seenIds.has(node.id)) {
+                    return false;
+                }
+                seenIds.add(node.id);
+                return true;
+            });
+
+            // Sort by credits to assign rank
+            pNodes.sort((a: PNode, b: PNode) => (b.credits || 0) - (a.credits || 0));
+
+            // Assign rank
+            pNodes = pNodes.map((node: PNode, index: number) => ({
+                ...node,
+                rank: index + 1
+            }));
+
             console.log(`✓ Fetched ${pNodes.length} pNodes from Rust backend`);
 
             return pNodes;
@@ -124,10 +204,8 @@ class PRPCService {
 
     /**
      * Get stats for a specific node
-     * Note: Rust backend currently doesn't expose direct IP stats, using findPNode logic or returning null
      */
     async getNodeStats(ip: string): Promise<any | null> {
-        // Not implemented in Rust backend yet
         return null;
     }
 
@@ -136,6 +214,7 @@ class PRPCService {
      */
     async findPNode(pubkey: string): Promise<PNode | null> {
         try {
+            await this.fetchCredits();
             const response = await fetch(`${API_BASE_URL}/node/${pubkey}`);
 
             if (!response.ok) {
@@ -148,7 +227,7 @@ class PRPCService {
                 throw new Error(data.error || 'pNode not found');
             }
 
-            return this.convertPodToPNode(data);
+            return this.convertPodToPNode(data, 0);
         } catch (error) {
             console.error(`Failed to find pNode ${pubkey}:`, error);
             return null;

@@ -1,15 +1,9 @@
 import { PNode } from '@/types/pnode';
-import { StatusBadge } from './StatusBadge';
-import { HealthScore } from './HealthScore';
-import { SignalsList } from './SignalsList';
-import { LatencyChart } from './LatencyChart';
-import { AvailabilityTimeline } from './AvailabilityTimeline';
 import { RawRPCViewer } from './RawRPCViewer';
 import { CopyButton } from './CopyButton';
-import { generateLatencyHistory, generateAvailabilityHistory, generateRawRPCResponses } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
-import { X, Bookmark, Globe } from 'lucide-react';
-import { formatDistanceToNow, format } from 'date-fns';
+import { Card } from '@/components/ui/card';
+import { X, Trophy, Coins, Database, Eye, EyeOff, Activity, Clock, Server } from 'lucide-react';
 
 interface PNodeDetailProps {
   node: PNode;
@@ -17,20 +11,22 @@ interface PNodeDetailProps {
 }
 
 export function PNodeDetail({ node, onClose }: PNodeDetailProps) {
-  const latencyData = generateLatencyHistory(node.id);
-  const availabilityData = generateAvailabilityHistory(node.id);
-  const rpcResponses = generateRawRPCResponses(node.id);
+  const formatBytes = (bytes: number) => {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
 
   return (
     <div className="h-full flex flex-col bg-card border-l border-border">
       <div className="flex items-center justify-between p-4 border-b border-border">
         <div className="flex items-center gap-3">
-          <h2 className="font-semibold">pNode Details</h2>
-          {node.isSeed && (
-            <span className="flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded">
-              <Bookmark className="h-3 w-3" /> Seed Node
-            </span>
-          )}
+          <h2 className="font-semibold">Node Inspector</h2>
+          <span className="text-xs font-mono text-muted-foreground border border-border px-1.5 py-0.5 rounded">
+            {node.version?.split('-')[0] || 'Unknown'}
+          </span>
         </div>
         <Button variant="ghost" size="sm" onClick={onClose} className="h-8 w-8 p-0">
           <X className="h-4 w-4" />
@@ -38,73 +34,131 @@ export function PNodeDetail({ node, onClose }: PNodeDetailProps) {
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-6">
-        {/* Identity Section */}
-        <section className="space-y-3">
-          <div className="flex items-center gap-2 group">
-            <code className="text-sm font-mono bg-muted px-2 py-1 rounded break-all">
-              {node.id}
-            </code>
-            <CopyButton text={node.id} />
-          </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Globe className="h-4 w-4" />
-            <span className="font-mono">{node.ip}</span>
-          </div>
-          <div className="text-xs text-muted-foreground">
-            Discovered {format(new Date(node.discoveredAt), 'MMM d, yyyy')}
-          </div>
-        </section>
+        {/* Top Row: Health & Visibility */}
+        <div className="grid grid-cols-2 gap-4">
+          <Card className="p-4 flex flex-col items-center justify-center bg-card/50">
+            <span className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Health Score</span>
+            <div className="text-4xl font-bold">{node.health.total}</div>
+          </Card>
+          <Card className="p-4 flex flex-col items-center justify-center bg-card/50">
+            <span className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Visibility</span>
+            <div className="flex items-center gap-2">
+              {node.isPublic ? (
+                <>
+                  <Eye className="w-5 h-5 text-green-500" />
+                  <span className="text-lg font-bold text-green-500">PUBLIC</span>
+                </>
+              ) : (
+                <>
+                  <EyeOff className="w-5 h-5 text-orange-500" />
+                  <span className="text-lg font-bold text-orange-500">PRIVATE</span>
+                </>
+              )}
+            </div>
+          </Card>
+        </div>
 
-        {/* Status Summary */}
-        <section className="space-y-3">
-          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-            Status Summary
-          </h3>
+        {/* Real Metrics Grid */}
+        <div className="grid grid-cols-3 gap-4">
+          <Card className="p-3 bg-card/50 flex flex-col items-center">
+            <Activity className="w-4 h-4 text-blue-500 mb-1" />
+            <span className="text-xs text-muted-foreground">Latency</span>
+            <span className="font-mono font-bold">{node.metrics.latency} ms</span>
+          </Card>
+          <Card className="p-3 bg-card/50 flex flex-col items-center">
+            <Clock className="w-4 h-4 text-green-500 mb-1" />
+            <span className="text-xs text-muted-foreground">Uptime</span>
+            <span className="font-mono font-bold">{node.metrics.uptime.toFixed(1)}%</span>
+          </Card>
+          <Card className="p-3 bg-card/50 flex flex-col items-center">
+            <Server className="w-4 h-4 text-purple-500 mb-1" />
+            <span className="text-xs text-muted-foreground">Status</span>
+            <span className={`font-mono font-bold ${node.status === 'online' ? 'text-green-500' : 'text-red-500'}`}>
+              {node.status.toUpperCase()}
+            </span>
+          </Card>
+        </div>
+
+        {/* Network Rewards */}
+        <div>
+          <div className="flex items-center gap-2 mb-2 text-sm text-muted-foreground">
+            <Trophy className="w-4 h-4" />
+            <span className="uppercase tracking-wider">Network Rewards</span>
+          </div>
           <div className="grid grid-cols-2 gap-4">
-            <div className="metric-card">
-              <span className="text-xs text-muted-foreground block mb-1">Current Status</span>
-              <StatusBadge status={node.status} />
-            </div>
-            <div className="metric-card">
-              <span className="text-xs text-muted-foreground block mb-1">Last Response</span>
-              <span className="text-sm font-mono">
-                {formatDistanceToNow(new Date(node.metrics.lastSeen), { addSuffix: true })}
-              </span>
-            </div>
-            <div className="metric-card">
-              <span className="text-xs text-muted-foreground block mb-1">Response Time</span>
-              <span className="text-sm font-mono">
-                {node.metrics.responseTime > 0 ? `${node.metrics.responseTime.toFixed(0)}ms` : '—'}
-              </span>
-            </div>
-            <div className="metric-card">
-              <span className="text-xs text-muted-foreground block mb-1">Gossip Participation</span>
-              <span className="text-sm font-mono">
-                {node.metrics.gossipParticipation > 0 ? `${node.metrics.gossipParticipation.toFixed(1)}%` : '—'}
-              </span>
-            </div>
+            <Card className="p-4 bg-card/50">
+              <span className="text-xs text-muted-foreground block mb-1">Global Rank</span>
+              <div className="text-2xl font-bold flex items-center gap-2">
+                <Trophy className="w-5 h-5 text-yellow-500" />
+                #{node.rank || '-'}
+              </div>
+            </Card>
+            <Card className="p-4 bg-card/50">
+              <span className="text-xs text-muted-foreground block mb-1">Credits</span>
+              <div className="text-2xl font-bold flex items-center gap-2">
+                <Coins className="w-5 h-5 text-yellow-500" />
+                {node.credits?.toLocaleString() || 0}
+              </div>
+            </Card>
           </div>
-        </section>
+        </div>
 
-        {/* Health Score Breakdown */}
-        <section className="space-y-3">
-          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-            Health Score
-          </h3>
-          <div className="metric-card">
-            <HealthScore health={node.health} showBreakdown />
+        {/* Storage Metrics */}
+        <div>
+          <div className="flex items-center gap-2 mb-2 text-sm text-muted-foreground">
+            <Database className="w-4 h-4" />
+            <span className="uppercase tracking-wider">Storage Metrics</span>
+          </div>
+          <Card className="p-4 bg-card/50 space-y-4">
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-muted-foreground">Used Storage</span>
+              <span className="font-mono font-medium">{formatBytes(node.storage.used)}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-muted-foreground">Committed Storage</span>
+              <span className="font-mono font-medium">{formatBytes(node.storage.committed)}</span>
+            </div>
+            <div className="space-y-1">
+              <div className="flex justify-between text-xs">
+                <span className="text-muted-foreground">Utilization</span>
+                <span>{(node.storage.usagePercent * 100).toFixed(6)}%</span>
+              </div>
+              <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-blue-500 transition-all duration-500"
+                  style={{ width: `${Math.min(100, node.storage.usagePercent * 100)}%` }}
+                />
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* Identity Section */}
+        <section className="space-y-3 pt-4 border-t border-border">
+          <div className="grid grid-cols-[100px_1fr] gap-2 text-sm">
+            <span className="text-muted-foreground">Last Seen</span>
+            <span className="font-mono text-right">
+              {node.metrics.lastSeen ? new Date(node.metrics.lastSeen).toLocaleString() : 'N/A'}
+            </span>
+
+            <span className="text-muted-foreground">RPC Endpoint</span>
+            <div className="flex items-center justify-end gap-2 group">
+              <span className="font-mono truncate max-w-[150px]">http://{node.ip}:6000</span>
+              <CopyButton text={`http://${node.ip}:6000`} />
+            </div>
+
+            <span className="text-muted-foreground">Public Key</span>
+            <div className="flex items-center justify-end gap-2 group">
+              <span className="font-mono truncate max-w-[150px]">{node.id}</span>
+              <CopyButton text={node.id} />
+            </div>
           </div>
         </section>
 
         {/* Monitoring Signals */}
-        <section className="space-y-3">
+        <section className="space-y-3 pt-4 border-t border-border">
           <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
             Monitoring Signals
-            {node.signals.length > 0 && (
-              <span className="ml-2 text-xs font-normal text-status-unstable">
-                ({node.signals.length})
-              </span>
-            )}
           </h3>
           <SignalsList signals={node.signals} />
         </section>
@@ -127,14 +181,6 @@ export function PNodeDetail({ node, onClose }: PNodeDetailProps) {
           <div className="metric-card">
             <LatencyChart data={latencyData} />
           </div>
-        </section>
-
-        {/* Raw RPC Data */}
-        <section className="space-y-3">
-          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-            Raw RPC Responses
-          </h3>
-          <RawRPCViewer responses={rpcResponses} />
         </section>
       </div>
     </div>

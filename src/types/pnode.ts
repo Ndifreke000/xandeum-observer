@@ -15,6 +15,12 @@ export interface PNodeHealthScore {
   responsiveness: number; // 0-100
 }
 
+export interface PNodeStorage {
+  used: number; // bytes
+  committed: number; // bytes
+  usagePercent: number; // 0-1
+}
+
 export interface GeoData {
   lat: number;
   lon: number;
@@ -28,6 +34,11 @@ export interface PNode {
   status: PNodeStatus;
   metrics: PNodeMetrics;
   health: PNodeHealthScore;
+  storage: PNodeStorage;
+  version?: string;
+  credits?: number;
+  rank?: number;
+  isPublic?: boolean;
   isSeed: boolean;
   discoveredAt: string;
   sessions: PNodeSession[];

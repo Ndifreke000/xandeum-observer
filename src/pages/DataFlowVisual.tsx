@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
+import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -101,27 +102,19 @@ export default function DataFlowVisual() {
     return (
         <div className="min-h-screen flex flex-col bg-background">
             {/* Header */}
-            <header className="sticky top-0 z-50 border-b border-border bg-card/80 backdrop-blur-sm">
-                <div className="container mx-auto px-6 py-4">
-                    <div className="flex items-center gap-4">
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => navigate('/')}
-                            className="gap-2"
-                        >
-                            <ArrowLeft className="h-4 w-4" />
-                            Back
-                        </Button>
-                        <div>
-                            <h1 className="text-xl font-semibold">Data Flow Visualization</h1>
-                            <p className="text-sm text-muted-foreground">
-                                Real-time visualization of transaction data flow
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </header>
+            <Header />
+
+            <div className="container mx-auto px-6 py-4 pb-0">
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => navigate('/')}
+                    className="gap-2 -ml-2"
+                >
+                    <ArrowLeft className="h-4 w-4" />
+                    Back to Dashboard
+                </Button>
+            </div>
 
             <main className="flex-1 container mx-auto px-6 py-6 space-y-6">
                 {/* Block Input */}

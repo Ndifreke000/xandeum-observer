@@ -10,6 +10,44 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { useState } from 'react';
+import { OverviewModal } from './OverviewModal';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu"
+import { cn } from "@/lib/utils"
+import React from "react"
+
+const ListItem = React.forwardRef<
+  React.ElementRef<"a">,
+  React.ComponentPropsWithoutRef<"a">
+>(({ className, title, children, ...props }, ref) => {
+  return (
+    <li>
+      <NavigationMenuLink asChild>
+        <a
+          ref={ref}
+          className={cn(
+            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+            className
+          )}
+          {...props}
+        >
+          <div className="text-sm font-medium leading-none">{title}</div>
+          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+            {children}
+          </p>
+        </a>
+      </NavigationMenuLink>
+    </li>
+  )
+})
+ListItem.displayName = "ListItem"
 
 interface HeaderProps {
   onRefresh?: () => void;
@@ -122,18 +160,18 @@ export const Header = ({ onRefresh, isLoading, lastUpdated }: HeaderProps) => {
             </Link>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant={location.pathname.startsWith('/contracts') ? "secondary" : "ghost"} size="sm" className="gap-2">
+                <Button variant={location.pathname.startsWith('/nodes') ? "secondary" : "ghost"} size="sm" className="gap-2">
                   <FileCode className="w-4 h-4" />
-                  Contracts
+                  Block Nodes
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="center" className="w-48">
-                <Link to="/contracts/eda">
+                <Link to="/nodes/eda">
                   <DropdownMenuItem className="cursor-pointer">
-                    Contract EDA
+                    Block Nodes EDA
                   </DropdownMenuItem>
                 </Link>
-                <Link to="/contracts/data-flow">
+                <Link to="/nodes/data-flow">
                   <DropdownMenuItem className="cursor-pointer">
                     Data Flow Visual
                   </DropdownMenuItem>
@@ -167,6 +205,7 @@ export const Header = ({ onRefresh, isLoading, lastUpdated }: HeaderProps) => {
                 <BookOpen className="h-4 w-4" />
               </a>
             </Button>
+            <OverviewModal />
           </div>
 
           {lastUpdated && (
@@ -211,6 +250,44 @@ export const Header = ({ onRefresh, isLoading, lastUpdated }: HeaderProps) => {
                       className="w-full bg-background/50 pl-9 h-9"
                     />
                   </div>
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger>Block Nodes</NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                      <ul className="grid gap-3 p-6 w-[400px]">
+                        <li className="row-span-3">
+                          <NavigationMenuLink asChild>
+                            <a
+                              className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                              href="/"
+                            >
+                              <div className="mb-2 mt-4 text-lg font-medium">
+                                Network Overview
+                              </div>
+                              <p className="text-sm leading-tight text-muted-foreground">
+                                Real-time status of all active pNodes in the Xandeum network.
+                              </p>
+                            </a>
+                          </NavigationMenuLink>
+                        </li>
+                        <ListItem href="/nodes/eda" title="Block Nodes EDA">
+                          Deep dive analysis of individual node performance and metrics.
+                        </ListItem>
+                        <ListItem href="/nodes/data-flow" title="Data Flow">
+                          Visualize data propagation across the network.
+                        </ListItem>
+                      </ul>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger>Contracts</NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                      <ul className="grid gap-3 p-6 w-[400px]">
+                        <ListItem href="/contracts/eda" title="Contract EDA">
+                          Exploratory Data Analysis for Smart Contracts.
+                        </ListItem>
+                      </ul>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
                   <div className="flex gap-2">
                     <Button variant="outline" size="sm" className="flex-1 gap-2" onClick={toggleTheme}>
                       {isDark ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}

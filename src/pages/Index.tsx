@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { NetworkStats } from '@/components/NetworkStats';
-import { PNodeTable } from '@/components/PNodeTable';
+import { PNodeGrid } from '@/components/PNodeGrid';
 import { PNodeDetail } from '@/components/PNodeDetail';
 import { prpcService } from '@/services/prpc';
 import { PNode } from '@/types/pnode';
@@ -42,7 +42,6 @@ const Index = () => {
     }
   }, [toast]);
 
-  // Initial fetch on mount
   // Initial fetch on mount and interval
   useEffect(() => {
     fetchPNodes();
@@ -81,8 +80,12 @@ const Index = () => {
           </div>
 
           <div className="border-t-2 border-border/60 pt-6">
-            <h2 className="text-lg font-medium mb-4">pNode Registry</h2>
-            <PNodeTable
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium">pNode Registry</h2>
+              <span className="text-sm text-muted-foreground">{nodes.length} Nodes Discovered</span>
+            </div>
+
+            <PNodeGrid
               nodes={nodes}
               onSelectNode={handleSelectNode}
               selectedNodeId={selectedNode?.id}
@@ -91,7 +94,7 @@ const Index = () => {
         </div>
 
         {selectedNode && (
-          <div className="fixed right-0 top-14 bottom-0 w-[480px] shadow-lg">
+          <div className="fixed right-0 top-14 bottom-0 w-[480px] shadow-lg z-40">
             <PNodeDetail node={selectedNode} onClose={handleCloseDetail} />
           </div>
         )}
