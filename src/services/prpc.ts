@@ -233,6 +233,33 @@ class PRPCService {
             return null;
         }
     }
+
+    /**
+     * Fetch node history from backend
+     */
+    public async getNodeHistory(nodeId: string): Promise<NodeHistoryRecord[]> {
+        try {
+            const response = await fetch(`${API_BASE_URL}/node/${nodeId}/history`);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch node history: ${response.statusText}`);
+            }
+            const data = await response.json();
+            if (data.error) {
+                console.warn(`Backend returned error for history: ${data.error}`);
+                return [];
+            }
+            return data;
+        } catch (error) {
+            console.error('Error fetching node history:', error);
+            return [];
+        }
+    }
+}
+
+export interface NodeHistoryRecord {
+    timestamp: number;
+    latency_ms: number | null;
+    status: string | null;
 }
 
 // Export singleton instance

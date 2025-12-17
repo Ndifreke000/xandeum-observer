@@ -47,6 +47,20 @@ pub async fn init_db() -> Result<(), sqlx::Error> {
         "#
     ).execute(&pool).await?;
 
+    sqlx::query(
+        r#"
+        CREATE TABLE IF NOT EXISTS node_history (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            pubkey TEXT NOT NULL,
+            timestamp INTEGER NOT NULL,
+            latency_ms INTEGER,
+            status TEXT,
+            FOREIGN KEY(pubkey) REFERENCES nodes(pubkey)
+        );
+        CREATE INDEX IF NOT EXISTS idx_node_history_pubkey_timestamp ON node_history(pubkey, timestamp);
+        "#
+    ).execute(&pool).await?;
+
     DB_POOL.set(pool).expect("Failed to set DB pool");
     Ok(())
 }
@@ -71,6 +85,13 @@ pub struct NodeRecord {
     pub city: Option<String>,
     pub lat: Option<f64>,
     pub lon: Option<f64>,
+}
+
+#[derive(Debug, Clone, sqlx::FromRow, serde::Serialize)]
+pub struct NodeHistoryRecord {
+    pub timestamp: i64,
+    pub latency_ms: Option<i64>,
+    pub status: Option<String>,
 }
 
 pub async fn upsert_node(node: &NodeRecord) -> Result<(), sqlx::Error> {
@@ -140,6 +161,25 @@ pub async fn save_snapshot(total_nodes: u32, online_nodes: u32, total_storage: u
     Ok(())
 }
 
+pub async fn save_node_history(pubkey: &str, latency_ms: Option<i64>, status: Option<&str>) -> Result<(), sqlx::Error> {
+    let pool = get_pool();
+    let timestamp = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_secs() as i64;
+
+    sqlx::query(
+        "INSERT INTO node_history (pubkey, timestamp, latency_ms, status) VALUES (?, ?, ?, ?)"
+    )
+    .bind(pubkey)
+    .bind(timestamp)
+    .bind(latency_ms)
+    .bind(status)
+    .execute(pool)
+    .await?;
+    Ok(())
+}
+
 pub async fn get_history(limit: i64) -> Result<Vec<(i64, i64, i64, i64)>, sqlx::Error> {
     let pool = get_pool();
     let rows = sqlx::query("SELECT timestamp, total_nodes, online_nodes, total_storage FROM metrics ORDER BY timestamp DESC LIMIT ?")
@@ -150,4 +190,15 @@ pub async fn get_history(limit: i64) -> Result<Vec<(i64, i64, i64, i64)>, sqlx::
     Ok(rows.into_iter().map(|r| (
         r.get(0), r.get(1), r.get(2), r.get(3)
     )).collect())
+}
+
+pub async fn get_node_history(pubkey: &str, limit: i64) -> Result<Vec<NodeHistoryRecord>, sqlx::Error> {
+    let pool = get_pool();
+    sqlx::query_as::<_, NodeHistoryRecord>(
+        "SELECT timestamp, latency_ms, status FROM node_history WHERE pubkey = ? ORDER BY timestamp DESC LIMIT ?"
+    )
+    .bind(pubkey)
+    .bind(limit)
+    .fetch_all(pool)
+    .await
 }

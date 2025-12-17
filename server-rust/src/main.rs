@@ -47,6 +47,7 @@ async fn main() {
     let app = Router::new()
         .route("/pods", get(get_pods))
         .route("/node/{id}", get(get_node))
+        .route("/node/{id}/history", get(get_node_history_handler))
         .route("/history", get(get_history))
         .route("/credits", get(get_credits))
         .layer(CorsLayer::permissive());
@@ -231,6 +232,11 @@ async fn refresh_data() {
             if let Err(e) = db::upsert_node(&record).await {
                 eprintln!("Failed to upsert node: {}", e);
             }
+
+            // Save history
+            if let Err(e) = db::save_node_history(&record.pubkey, record.latency_ms, record.status.as_deref()).await {
+                eprintln!("Failed to save node history: {}", e);
+            }
         }
     }
 }
@@ -338,6 +344,13 @@ async fn get_credits() -> impl IntoResponse {
                 Err(e) => Json(serde_json::json!({ "error": e.to_string() })),
             }
         },
+        Err(e) => Json(serde_json::json!({ "error": e.to_string() })),
+    }
+}
+
+async fn get_node_history_handler(Path(id): Path<String>) -> impl IntoResponse {
+    match db::get_node_history(&id, 100).await {
+        Ok(history) => Json(serde_json::to_value(history).unwrap()),
         Err(e) => Json(serde_json::json!({ "error": e.to_string() })),
     }
 }

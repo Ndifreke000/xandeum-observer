@@ -31,11 +31,33 @@ export function useNodeAnalysis(initialNodeId?: string): UseNodeAnalysisResult {
 
         try {
             // 1. Fetch real node data from backend
-            const realNode = await prpcService.findPNode(nodeId);
+            const [realNode, history] = await Promise.all([
+                prpcService.findPNode(nodeId),
+                prpcService.getNodeHistory(nodeId)
+            ]);
 
             if (realNode) {
-                // 2. Return only what we have (Identity)
-                // We do NOT generate mock data for charts anymore as per user request for honesty.
+                // Calculate stats from history
+                const latencies = history
+                    .filter(h => h.latency_ms !== null)
+                    .map(h => h.latency_ms as number)
+                    .sort((a, b) => a - b);
+
+                const p95 = latencies.length > 0 ? latencies[Math.floor(latencies.length * 0.95)] : 0;
+                const p99 = latencies.length > 0 ? latencies[Math.floor(latencies.length * 0.99)] : 0;
+                const median = latencies.length > 0 ? latencies[Math.floor(latencies.length * 0.5)] : (realNode.metrics?.latency || 0);
+
+                // Map history to latency distribution for chart
+                // We'll use the last 20 points for the sparkline/chart
+                const latencyDistribution = history
+                    .slice(0, 50) // Take last 50 points
+                    .reverse() // Oldest first
+                    .map(h => ({
+                        latency: h.latency_ms || 0,
+                        timestamp: new Date(h.timestamp * 1000).toISOString(),
+                        failed: h.status !== 'online'
+                    }));
+
                 const realAnalysis: NodeAnalysis = {
                     nodeId: realNode.id,
                     generatedAt: new Date().toISOString(),
@@ -45,14 +67,13 @@ export function useNodeAnalysis(initialNodeId?: string): UseNodeAnalysisResult {
                         version: realNode.version,
                         firstSeen: realNode.discoveredAt || new Date().toISOString(),
                         lastSeen: realNode.metrics?.lastSeen || new Date().toISOString(),
-                        uptimeDays: realNode.metrics?.uptime ? (realNode.metrics.uptime / 100) * 30 : 0, // Approximate from percentage
+                        uptimeDays: realNode.metrics?.uptime ? (realNode.metrics.uptime / 100) * 30 : 0,
                         isActive: realNode.status === 'online',
                     },
-                    // We can populate some performance signals from real metrics if available
                     performance: {
-                        medianLatency: realNode.metrics?.latency || 0,
-                        p95Latency: 0, // Not available yet
-                        p99Latency: 0, // Not available yet
+                        medianLatency: median,
+                        p95Latency: p95,
+                        p99Latency: p99,
                         failureRate: 0,
                         totalFailures: 0,
                         retryPatterns: {
@@ -62,8 +83,10 @@ export function useNodeAnalysis(initialNodeId?: string): UseNodeAnalysisResult {
                             backoffDetected: false
                         },
                         performanceTier: realNode.health?.total > 80 ? 'excellent' : realNode.health?.total > 50 ? 'good' : 'poor',
-                        latencyDistribution: []
-                    }
+                        latencyDistribution: latencyDistribution
+                    },
+                    // We still don't have real traffic/IO data, so we leave them undefined to show "No Data"
+                    // or we could map pings to traffic if we wanted to be "creative" but honest is better.
                 };
                 setAnalysis(realAnalysis);
             } else {
