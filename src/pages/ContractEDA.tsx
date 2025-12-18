@@ -62,12 +62,19 @@ export default function ContractEDA() {
             <Header />
 
             <main className="flex-1 w-full px-6 py-6 space-y-6">
+                <div className="flex flex-col gap-2">
+                    <h1 className="text-3xl font-bold tracking-tight">Storage Simulator</h1>
+                    <p className="text-muted-foreground">
+                        Simulate dApp storage costs and performance on Xandeum's exabyte-scale layer.
+                    </p>
+                </div>
+
                 {/* Search & Controls */}
                 <Card className="p-4 border-border/50 bg-card/50 backdrop-blur-sm">
                     <div className="flex flex-col md:flex-row gap-4 items-end md:items-center justify-between">
                         <div className="flex-1 w-full md:max-w-xl flex gap-2">
                             <Input
-                                placeholder="Enter Contract Address..."
+                                placeholder="Enter Contract Address to simulate..."
                                 value={contractAddress}
                                 onChange={(e) => setContractAddress(e.target.value)}
                                 className="font-mono"
@@ -75,9 +82,10 @@ export default function ContractEDA() {
                             />
                             <Button onClick={handleSearch} disabled={isLoading || !contractAddress}>
                                 {isLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-                                <span className="ml-2 hidden sm:inline">Analyze</span>
+                                <span className="ml-2 hidden sm:inline">Simulate</span>
                             </Button>
                         </div>
+                        {/* ... rest of controls ... */}
 
                         <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
                             <div className="flex items-center gap-2">

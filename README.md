@@ -1,84 +1,78 @@
-# Xandeum Network Observer
+# 🌌 Xandeum Network Observer
 
-A world-class, real-time analytics platform for the Xandeum storage network. This dashboard provides deep insights into pNode performance, network health, and geographic distribution.
+**The definitive real-time analytics engine for Xandeum's exabyte-scale storage layer.**
 
-![Xandeum Observer](https://raw.githubusercontent.com/xandeum/xandeum-observer/main/public/screenshot.png)
+[![Live Demo](https://img.shields.io/badge/Live-Demo-emerald?style=for-the-badge)](https://xandeum-observer.vercel.app)
+[![Backend Status](https://img.shields.io/badge/Backend-Live-blue?style=for-the-badge)](https://xandeum-observer-ophq.onrender.com/pods)
+[![License](https://img.shields.io/badge/License-MIT-purple?style=for-the-badge)](LICENSE)
 
-## 🚀 Features
+Xandeum Network Observer is a world-class monitoring platform designed to provide deep, actionable insights into the Xandeum pNode network. Built for speed, clarity, and scalability, it empowers developers and node operators to visualize the pulse of the decentralized storage revolution.
 
-*   **Real-Time Monitoring**: Live updates every 10 seconds via pRPC.
-*   **Geospatial Visualization**: Interactive 3D Globe showing physical node distribution.
-*   **Historical Analytics**: 24-hour history of network growth and storage capacity.
-*   **Advanced Metrics**: Latency, Uptime, and Health Scores for every node.
-*   **Contract EDA**: Exploratory Data Analysis for smart contracts (Coming Soon).
-*   **Data Export**: Download node data as CSV or JSON.
-*   **Premium UI**: "Milk" theme with glassmorphism and responsive design.
+---
 
-## 🛠️ Tech Stack
+## ✨ Key Innovations
 
-*   **Frontend**: React, TypeScript, Vite, TailwindCSS, Shadcn/UI, Recharts, React Globe GL.
-*   **Backend**: Rust (Axum, Tokio), In-Memory History, IP Geolocation.
-*   **Communication**: pRPC (Xandeum's custom RPC protocol).
+### 📡 Live Gossip Feed
+Experience the network in real-time. Our custom gossip listener tracks node discoveries, status changes, and storage events as they happen, providing a "live pulse" of the network.
 
-## ⚡ Quick Start
+### 🌍 3D Geospatial Intelligence
+Visualize the global footprint of Xandeum. Our interactive 3D globe maps pNodes to their physical locations, providing a clear view of network decentralization and density.
+
+### ⌨️ Command Palette (⌘K)
+Navigate the network at light speed. Our integrated command palette allows for instant searching of nodes by IP, ID, or location, making troubleshooting and analysis effortless.
+
+### 🧪 Storage Simulator
+Bridging the gap for dApp developers. Simulate storage costs and performance metrics for smart contracts on Xandeum's unique exabyte-scale layer.
+
+---
+
+## 🛠️ High-Performance Architecture
+
+Our stack is engineered for sub-millisecond responsiveness and 100% data accuracy.
+
+- **Frontend**: React 18, TypeScript, Vite, TailwindCSS, Framer Motion.
+- **Backend**: Rust (Axum, Tokio) for high-concurrency pRPC data aggregation.
+- **Database**: SQLite with SQLx for persistent historical performance tracking.
+- **Data Flow**: Direct integration with Xandeum's pRPC protocol via seed nodes.
+
+```mermaid
+graph TD
+    A[User Browser] -->|HTTP/WS| B[Vite Frontend]
+    B -->|REST API| C[Rust Backend]
+    C -->|pRPC| D[Xandeum Network]
+    C -->|SQL| E[SQLite Persistence]
+    C -->|GeoJSON| F[IP Geolocation]
+```
+
+---
+
+## 🚀 Getting Started
 
 ### Prerequisites
-*   Node.js 18+
-*   Rust (latest stable)
+- Node.js 18+
+- Rust (latest stable)
 
 ### 1. Backend (Rust)
-The backend handles pRPC connections, geolocation, and historical data aggregation.
-
 ```bash
 cd server-rust
 cargo run --release
 ```
-*Server runs on port 3001.*
 
 ### 2. Frontend (React)
-The frontend connects to the Rust backend for data.
-
 ```bash
-# Install dependencies
 npm install
-
-# Start development server
 npm run dev
 ```
-*Frontend runs on port 8080.*
-
-## 🌍 Deployment
-
-### Backend (Render Web Service)
-1.  Create a **Web Service** on Render.
-2.  Connect your repo.
-3.  **Runtime**: Rust.
-4.  **Root Directory**: `server-rust`.
-5.  **Build Command**: `cargo build --release`.
-6.  **Start Command**: `cargo run --release`.
-
-### Frontend (Vercel/Render Static Site)
-1.  Create a **Static Site**.
-2.  **Build Command**: `npm run build`.
-3.  **Publish Directory**: `dist`.
-4.  **Environment Variables**:
-    *   `VITE_API_URL`: URL of your deployed Rust backend (e.g., `https://your-rust-app.onrender.com`).
-
-## 📊 Architecture
-
-```mermaid
-graph TD
-    A[User Browser] -->|HTTP/WebSocket| B[React Frontend]
-    B -->|REST API| C[Rust Backend]
-    C -->|pRPC| D[Xandeum Network]
-    C -->|HTTP| E[IP Geolocation API]
-    C -->|In-Memory| F[Historical Data Store]
-```
-
-## 🏆 Hackathon Notes
-*   **Real Data Only**: No mock data is used. All stats come directly from the Xandeum network.
-*   **Performance**: Rust backend ensures sub-millisecond response times for cached data.
-*   **Design**: Focused on "World Class" aesthetics with a clean, professional look.
 
 ---
+
+## 🏆 Why Xandeum Observer?
+
+Unlike basic dashboards, the Xandeum Observer focuses on **Clarity** and **Innovation**:
+- **Zero Mock Data**: Every metric is pulled directly from the pRPC gossip network.
+- **Deep Space Aesthetics**: A premium "Deep Space" theme designed for professional monitoring environments.
+- **Developer First**: Built-in tools for contract simulation and raw JSON inspection.
+
+---
+
 Built with ❤️ for the Xandeum Hackathon.

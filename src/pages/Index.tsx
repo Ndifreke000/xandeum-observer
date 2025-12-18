@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import GlobeVisualization from '@/components/GlobeVisualization';
 import { HistoricalCharts } from '@/components/HistoricalCharts';
 import { Leaderboard } from '@/components/Leaderboard';
+import { GossipFeed } from '@/components/GossipFeed';
 
 const Index = () => {
   const [nodes, setNodes] = useState<PNode[]>([]);
@@ -74,31 +75,27 @@ const Index = () => {
 
       <main className="flex-1 flex relative">
         <div className={`flex-1 p-6 space-y-6 transition-all ${selectedNode ? 'lg:mr-[480px]' : ''}`}>
-          <div>
-            <h1 className="text-xl font-semibold mb-6">Network Overview</h1>
-          </div>
-
           <NetworkStats nodes={nodes} />
 
-          <HistoricalCharts />
+          <HistoricalCharts nodes={nodes} />
 
           <Leaderboard nodes={nodes} onSelectNode={handleSelectNode} />
 
           <div className="mb-6">
             <GlobeVisualization nodes={nodes} />
-          </div>
 
-          <div className="border-t-2 border-border/60 pt-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-medium">pNode Registry</h2>
-              <span className="text-sm text-muted-foreground">{nodes.length} Nodes Discovered</span>
+            <div className="border-t-2 border-border/60 pt-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-medium">pNode Registry</h2>
+                <span className="text-sm text-muted-foreground">{nodes.length} Nodes Discovered</span>
+              </div>
+
+              <PNodeGrid
+                nodes={nodes}
+                onSelectNode={handleSelectNode}
+                selectedNodeId={selectedNode?.id}
+              />
             </div>
-
-            <PNodeGrid
-              nodes={nodes}
-              onSelectNode={handleSelectNode}
-              selectedNodeId={selectedNode?.id}
-            />
           </div>
         </div>
 

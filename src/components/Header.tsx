@@ -51,6 +51,7 @@ ListItem.displayName = "ListItem"
 
 import { PNode } from '@/types/pnode';
 import { CommandMenu } from './CommandMenu';
+import { NetworkHealth } from './NetworkHealth';
 
 interface HeaderProps {
   onRefresh?: () => void;
@@ -103,7 +104,7 @@ export const Header = ({
           <DropdownMenuContent align="end" className="w-48">
             <Link to="/contracts/eda">
               <DropdownMenuItem className="cursor-pointer">
-                Contract EDA
+                Storage Simulator
               </DropdownMenuItem>
             </Link>
             <Link to="/contracts/data-flow">
@@ -143,7 +144,7 @@ export const Header = ({
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 shadow-sm">
       <div className="w-full flex h-16 items-center justify-between px-6">
-        {/* Left: Logo */}
+        {/* Left: Logo & Health */}
         <div className="flex items-center gap-6">
           <Link to="/" className="flex items-center gap-2 group">
             <div className="relative flex h-8 w-8 items-center justify-center">
@@ -158,6 +159,10 @@ export const Header = ({
               </span>
             </div>
           </Link>
+
+          <div className="hidden lg:block">
+            <NetworkHealth nodes={nodes} />
+          </div>
         </div>
 
         {/* Center: Navigation & Search */}
@@ -251,44 +256,6 @@ export const Header = ({
                   <div className="w-full mb-4">
                     <CommandMenu nodes={nodes} onSelectNode={onSelectNode} />
                   </div>
-                  <NavigationMenuItem>
-                    <NavigationMenuTrigger>Block Nodes</NavigationMenuTrigger>
-                    <NavigationMenuContent>
-                      <ul className="grid gap-3 p-6 w-[400px]">
-                        <li className="row-span-3">
-                          <NavigationMenuLink asChild>
-                            <a
-                              className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                              href="/"
-                            >
-                              <div className="mb-2 mt-4 text-lg font-medium">
-                                Network Overview
-                              </div>
-                              <p className="text-sm leading-tight text-muted-foreground">
-                                Real-time status of all active pNodes in the Xandeum network.
-                              </p>
-                            </a>
-                          </NavigationMenuLink>
-                        </li>
-                        <ListItem href="/nodes/eda" title="Block Nodes EDA">
-                          Deep dive analysis of individual node performance and metrics.
-                        </ListItem>
-                        <ListItem href="/nodes/data-flow" title="Data Flow">
-                          Visualize data propagation across the network.
-                        </ListItem>
-                      </ul>
-                    </NavigationMenuContent>
-                  </NavigationMenuItem>
-                  <NavigationMenuItem>
-                    <NavigationMenuTrigger>Contracts</NavigationMenuTrigger>
-                    <NavigationMenuContent>
-                      <ul className="grid gap-3 p-6 w-[400px]">
-                        <ListItem href="/contracts/eda" title="Contract EDA">
-                          Exploratory Data Analysis for Smart Contracts.
-                        </ListItem>
-                      </ul>
-                    </NavigationMenuContent>
-                  </NavigationMenuItem>
                   <div className="flex gap-2">
                     <Button variant="outline" size="sm" className="flex-1 gap-2" onClick={toggleTheme}>
                       {isDark ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
