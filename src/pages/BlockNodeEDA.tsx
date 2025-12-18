@@ -94,7 +94,14 @@ export default function BlockNodeEDA() {
     return (
         <div className="min-h-screen flex flex-col bg-background">
             {/* Header */}
-            <Header />
+            <Header
+                nodes={nodes}
+                onSelectNode={(node) => {
+                    setNodeId(node.id);
+                    setSearchId(node.id);
+                    fetchAnalysis(node.id);
+                }}
+            />
 
             <div className="w-full px-6 py-4 pb-0">
                 <Button
@@ -201,8 +208,26 @@ export default function BlockNodeEDA() {
                 </div>
 
                 {error && (
-                    <Alert variant="destructive">
-                        <AlertDescription>{error}</AlertDescription>
+                    <Alert variant="destructive" className="bg-destructive/10 border-destructive/20">
+                        <div className="flex flex-col gap-3">
+                            <AlertDescription className="font-medium">{error}</AlertDescription>
+                            {error.includes("not found") && (
+                                <div className="flex flex-col gap-2 p-3 bg-background/50 rounded-md border border-destructive/10">
+                                    <p className="text-sm text-muted-foreground">
+                                        Is this a <strong>Contract Address</strong>? The Node Inspector only analyzes Physical Nodes (pNodes).
+                                    </p>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="w-fit gap-2"
+                                        onClick={() => navigate('/contracts/eda')}
+                                    >
+                                        <FileCode className="h-4 w-4" />
+                                        Try Contract EDA
+                                    </Button>
+                                </div>
+                            )}
+                        </div>
                     </Alert>
                 )}
 

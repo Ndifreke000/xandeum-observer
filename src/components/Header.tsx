@@ -56,14 +56,20 @@ interface HeaderProps {
   onRefresh?: () => void;
   isLoading?: boolean;
   lastUpdated?: Date | null;
-  nodes: PNode[];
-  onSelectNode: (node: PNode) => void;
+  nodes?: PNode[];
+  onSelectNode?: (node: PNode) => void;
 }
 
-export const Header = ({ onRefresh, isLoading, lastUpdated, nodes, onSelectNode }: HeaderProps) => {
+export const Header = ({
+  onRefresh,
+  isLoading,
+  lastUpdated,
+  nodes = [],
+  onSelectNode = () => { }
+}: HeaderProps) => {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
-  const [isDark, setIsDark] = useState(false); // Default to light mode for "milk" theme showcase
+  const [isDark, setIsDark] = useState(true); // Default to dark mode as requested
 
   const isActive = (path: string) => location.pathname === path;
 

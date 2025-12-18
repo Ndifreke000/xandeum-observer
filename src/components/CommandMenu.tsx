@@ -47,7 +47,7 @@ export function CommandMenu({ nodes, onSelectNode }: CommandMenuProps) {
                 <CommandList>
                     <CommandEmpty>No results found.</CommandEmpty>
                     <CommandGroup heading="Active Nodes">
-                        {nodes.filter(n => n.status === 'online').slice(0, 10).map((node) => (
+                        {(nodes || []).filter(n => n.status === 'online').slice(0, 10).map((node) => (
                             <CommandItem
                                 key={node.id}
                                 onSelect={() => {
@@ -69,7 +69,7 @@ export function CommandMenu({ nodes, onSelectNode }: CommandMenuProps) {
                         ))}
                     </CommandGroup>
                     <CommandGroup heading="Other Nodes">
-                        {nodes.filter(n => n.status !== 'online').slice(0, 5).map((node) => (
+                        {(nodes || []).filter(n => n.status !== 'online').slice(0, 5).map((node) => (
                             <CommandItem
                                 key={node.id}
                                 onSelect={() => {
