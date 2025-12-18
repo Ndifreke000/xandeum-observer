@@ -11,7 +11,6 @@ use tower_http::cors::CorsLayer;
 use serde::{Serialize, Deserialize};
 use once_cell::sync::Lazy;
 use dashmap::DashMap;
-use std::sync::RwLock;
 use rand::seq::SliceRandom;
 use db::NodeRecord;
 

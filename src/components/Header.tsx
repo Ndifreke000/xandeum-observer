@@ -49,13 +49,18 @@ const ListItem = React.forwardRef<
 })
 ListItem.displayName = "ListItem"
 
+import { PNode } from '@/types/pnode';
+import { CommandMenu } from './CommandMenu';
+
 interface HeaderProps {
   onRefresh?: () => void;
   isLoading?: boolean;
   lastUpdated?: Date | null;
+  nodes: PNode[];
+  onSelectNode: (node: PNode) => void;
 }
 
-export const Header = ({ onRefresh, isLoading, lastUpdated }: HeaderProps) => {
+export const Header = ({ onRefresh, isLoading, lastUpdated, nodes, onSelectNode }: HeaderProps) => {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [isDark, setIsDark] = useState(false); // Default to light mode for "milk" theme showcase
@@ -180,13 +185,8 @@ export const Header = ({ onRefresh, isLoading, lastUpdated }: HeaderProps) => {
             </DropdownMenu>
           </nav>
 
-          <div className="relative w-full max-w-xs lg:max-w-sm">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search..."
-              className="w-full bg-background/50 pl-9 h-9 focus-visible:ring-1"
-            />
+          <div className="w-full max-w-xs lg:max-w-sm">
+            <CommandMenu nodes={nodes} onSelectNode={onSelectNode} />
           </div>
         </div>
 
@@ -242,13 +242,8 @@ export const Header = ({ onRefresh, isLoading, lastUpdated }: HeaderProps) => {
                 </div>
 
                 <div className="px-2">
-                  <div className="relative w-full mb-4">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      type="search"
-                      placeholder="Search..."
-                      className="w-full bg-background/50 pl-9 h-9"
-                    />
+                  <div className="w-full mb-4">
+                    <CommandMenu nodes={nodes} onSelectNode={onSelectNode} />
                   </div>
                   <NavigationMenuItem>
                     <NavigationMenuTrigger>Block Nodes</NavigationMenuTrigger>

@@ -76,7 +76,15 @@ export const NetworkStats = ({ nodes }: NetworkStatsProps) => {
           <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-transparent via-transparent to-${stat.color.split('-')[1]}-500/5`} />
           <CardContent className="p-6 flex flex-col justify-between h-full relative z-10">
             <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{stat.label}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{stat.label}</span>
+                {stat.label === 'Active Nodes' && (
+                  <div className="flex items-center gap-1.5 bg-green-500/10 px-1.5 py-0.5 rounded border border-green-500/20">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                    <span className="text-[10px] font-bold text-green-500 tracking-tighter">LIVE</span>
+                  </div>
+                )}
+              </div>
               <div className={`p-2 rounded-lg ${stat.bg}`}>
                 <stat.icon className={`h-5 w-5 ${stat.color}`} />
               </div>

@@ -8,6 +8,7 @@ import { PNode } from '@/types/pnode';
 import { useToast } from '@/hooks/use-toast';
 import GlobeVisualization from '@/components/GlobeVisualization';
 import { HistoricalCharts } from '@/components/HistoricalCharts';
+import { Leaderboard } from '@/components/Leaderboard';
 
 const Index = () => {
   const [nodes, setNodes] = useState<PNode[]>([]);
@@ -63,10 +64,16 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header onRefresh={handleRefresh} isLoading={isLoading} lastUpdated={lastUpdated} />
+      <Header
+        onRefresh={handleRefresh}
+        isLoading={isLoading}
+        lastUpdated={lastUpdated}
+        nodes={nodes}
+        onSelectNode={handleSelectNode}
+      />
 
-      <main className="flex-1 flex">
-        <div className={`flex-1 p-6 space-y-6 transition-all ${selectedNode ? 'mr-[480px]' : ''}`}>
+      <main className="flex-1 flex relative">
+        <div className={`flex-1 p-6 space-y-6 transition-all ${selectedNode ? 'lg:mr-[480px]' : ''}`}>
           <div>
             <h1 className="text-xl font-semibold mb-6">Network Overview</h1>
           </div>
@@ -74,6 +81,8 @@ const Index = () => {
           <NetworkStats nodes={nodes} />
 
           <HistoricalCharts />
+
+          <Leaderboard nodes={nodes} onSelectNode={handleSelectNode} />
 
           <div className="mb-6">
             <GlobeVisualization nodes={nodes} />
@@ -94,7 +103,7 @@ const Index = () => {
         </div>
 
         {selectedNode && (
-          <div className="fixed right-0 top-14 bottom-0 w-[480px] shadow-lg z-40">
+          <div className="fixed inset-0 lg:inset-auto lg:right-0 lg:top-14 lg:bottom-0 lg:w-[480px] shadow-2xl z-50 bg-background/95 backdrop-blur-sm lg:backdrop-blur-none">
             <PNodeDetail node={selectedNode} onClose={handleCloseDetail} />
           </div>
         )}

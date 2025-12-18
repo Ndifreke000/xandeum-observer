@@ -42,7 +42,7 @@ const GlobeVisualization = ({ nodes }: GlobeVisualizationProps) => {
     }, [nodes]);
 
     return (
-        <Card ref={containerRef} className="h-[500px] w-full overflow-hidden bg-black/40 backdrop-blur-md border-white/10 relative">
+        <Card ref={containerRef} className="h-[300px] md:h-[500px] w-full overflow-hidden bg-black/40 backdrop-blur-md border-white/10 relative">
             <div className="absolute top-4 left-4 z-10 pointer-events-none">
                 <h2 className="text-xl font-bold text-white">Live Network Map</h2>
                 <p className="text-sm text-gray-400">
