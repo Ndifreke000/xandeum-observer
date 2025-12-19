@@ -67,7 +67,7 @@ export function Leaderboard({ nodes, onSelectNode }: LeaderboardProps) {
                                 <div className="flex justify-between items-center">
                                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                         <Coins className="w-3.5 h-3.5 text-yellow-500" />
-                                        Rewards
+                                        STOINC Rewards
                                     </div>
                                     <div className="font-mono font-bold">{node.credits?.toLocaleString() || 0}</div>
                                 </div>

@@ -2,7 +2,7 @@ import { NodeAnalysis } from '@/types/node-analysis';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CopyButton } from '@/components/CopyButton';
-import { formatRelativeTime } from '@/lib/contract-utils'; // Reusing util
+import { formatRelativeTime } from '@/lib/node-utils';
 import { Clock, Activity, Calendar, Server, Shield } from 'lucide-react';
 
 interface NodeIdentityProps {

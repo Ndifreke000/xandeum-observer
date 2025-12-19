@@ -106,13 +106,18 @@ export function StorageAnalysis({ analysis, storage }: StorageAnalysisProps) {
                         <span className="font-mono font-medium text-sm">{formatBytes(storage.committed)}</span>
                     </div>
                     <div className="pt-4 border-t border-border/50">
-                        <div className="text-xs text-muted-foreground mb-1">Storage Health</div>
-                        <div className="flex items-center gap-2">
+                        <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Capacity Planning</div>
+                        <div className="flex items-center gap-2 mb-2">
                             <div className={`h-2 w-2 rounded-full ${storage.usagePercent > 0.9 ? 'bg-red-500' : 'bg-green-500'}`} />
                             <span className="text-sm font-medium">
                                 {storage.usagePercent > 0.9 ? 'Critical' : 'Healthy'}
                             </span>
                         </div>
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                            {storage.usagePercent < 0.5
+                                ? "High redundancy potential. This node has significant headroom for new sedApp storage allocations."
+                                : "Approaching capacity. Consider increasing committed storage to maintain SLA guarantees."}
+                        </p>
                     </div>
                 </div>
             </div>

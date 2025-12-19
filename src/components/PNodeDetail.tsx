@@ -3,7 +3,11 @@ import { RawRPCViewer } from './RawRPCViewer';
 import { CopyButton } from './CopyButton';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { X, Trophy, Coins, Database, Eye, EyeOff, Activity, Clock, Server } from 'lucide-react';
+import { X, Trophy, Coins, Database, Eye, EyeOff, Activity, Clock, Server, Info } from 'lucide-react';
+import { SignalsList } from './SignalsList';
+import { AvailabilityTimeline } from './AvailabilityTimeline';
+import { LatencyChart } from './LatencyChart';
+import { AvailabilityDataPoint, LatencyDataPoint } from '@/types/pnode';
 
 interface PNodeDetailProps {
   node: PNode;
@@ -18,6 +22,10 @@ export function PNodeDetail({ node, onClose }: PNodeDetailProps) {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
+
+  // History data should come from the parent or a hook, not generated here
+  const availabilityData: AvailabilityDataPoint[] = [];
+  const latencyData: LatencyDataPoint[] = [];
 
   return (
     <div className="h-full flex flex-col bg-card border-l border-border">

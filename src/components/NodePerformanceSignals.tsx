@@ -83,8 +83,8 @@ export function NodePerformanceSignals({ analysis }: NodePerformanceSignalsProps
                     </div>
                 </div>
 
-                {/* Status Check */}
-                <div className="pt-4 border-t border-border/50">
+                {/* Status Check & DevOps Insights */}
+                <div className="pt-4 border-t border-border/50 space-y-4">
                     <div className="flex items-center gap-2 text-sm">
                         {performance.failureRate < 1 ? (
                             <CheckCircle2 className="h-4 w-4 text-green-500" />
@@ -96,6 +96,15 @@ export function NodePerformanceSignals({ analysis }: NodePerformanceSignalsProps
                                 ? "Node is performing within optimal parameters."
                                 : "Node is experiencing elevated failure rates."}
                         </span>
+                    </div>
+
+                    <div className="bg-muted/30 p-3 rounded-md border border-border/50">
+                        <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">DevOps Insights</div>
+                        <div className="text-xs text-muted-foreground leading-relaxed">
+                            {performance.medianLatency < 100
+                                ? "Low latency detected. Ideal for storage-heavy sedApps requiring fast read/write cycles."
+                                : "Elevated latency. May impact performance of real-time dApps using this pNode."}
+                        </div>
                     </div>
                 </div>
             </div>

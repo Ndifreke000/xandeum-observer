@@ -16,7 +16,7 @@ import { useNodeAnalysis } from '@/hooks/useNodeAnalysis';
 import { NodeIdentity } from '@/components/NodeIdentity';
 import { StorageAnalysis } from '@/components/StorageAnalysis';
 import { NodePerformanceSignals } from '@/components/NodePerformanceSignals';
-import { Search, RefreshCw, Clock, ArrowLeft, Check, ChevronsUpDown, FileCode } from 'lucide-react';
+import { Search, RefreshCw, Clock, ArrowLeft, Check, ChevronsUpDown, FileCode, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { prpcService } from '@/services/prpc';
 import { PNode } from '@/types/pnode';
@@ -214,17 +214,8 @@ export default function BlockNodeEDA() {
                             {error.includes("not found") && (
                                 <div className="flex flex-col gap-2 p-3 bg-background/50 rounded-md border border-destructive/10">
                                     <p className="text-sm text-muted-foreground">
-                                        Is this a <strong>Contract Address</strong>? The Node Inspector only analyzes Physical Nodes (pNodes).
+                                        Node not found in the network. Please verify the Node ID.
                                     </p>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        className="w-fit gap-2"
-                                        onClick={() => navigate('/contracts/eda')}
-                                    >
-                                        <FileCode className="h-4 w-4" />
-                                        Try Contract EDA
-                                    </Button>
                                 </div>
                             )}
                         </div>

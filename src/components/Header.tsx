@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { RefreshCw, Menu, FileCode, Network, Search, Sun, Moon, Github, BookOpen } from 'lucide-react';
+import { RefreshCw, Menu, FileCode, Network, Search, Sun, Moon, Github, BookOpen, ChevronDown, Activity } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   DropdownMenu,
@@ -10,7 +10,6 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { useState } from 'react';
-import { OverviewModal } from './OverviewModal';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -93,48 +92,16 @@ export const Header = ({
         </Button>
       </Link>
 
-      <div className="hidden md:block">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant={location.pathname.startsWith('/contracts') ? "secondary" : "ghost"} className="gap-2">
-              <FileCode className="w-4 h-4" />
-              Contracts
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <Link to="/contracts/eda">
-              <DropdownMenuItem className="cursor-pointer">
-                Storage Simulator
-              </DropdownMenuItem>
-            </Link>
-            <Link to="/contracts/data-flow">
-              <DropdownMenuItem className="cursor-pointer">
-                Data Flow Visual
-              </DropdownMenuItem>
-            </Link>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-
-      {/* Mobile Contract Links */}
       <div className="md:hidden space-y-1 pl-4 border-l-2 border-border/50 ml-2">
-        <div className="text-xs font-medium text-muted-foreground mb-2 px-4">Contracts</div>
-        <Link to="/contracts/eda">
+        <div className="text-xs font-medium text-muted-foreground mb-2 px-4">Deep Dive</div>
+        <Link to="/nodes/inspector">
           <Button
-            variant={isActive('/contracts/eda') ? "secondary" : "ghost"}
+            variant={isActive('/nodes/inspector') ? "secondary" : "ghost"}
             className="w-full justify-start gap-2 text-sm h-9"
             onClick={() => setIsOpen(false)}
           >
-            EDA Dashboard
-          </Button>
-        </Link>
-        <Link to="/contracts/data-flow">
-          <Button
-            variant={isActive('/contracts/data-flow') ? "secondary" : "ghost"}
-            className="w-full justify-start gap-2 text-sm h-9"
-            onClick={() => setIsOpen(false)}
-          >
-            Data Flow
+            <Activity className="w-4 h-4" />
+            Node Inspector
           </Button>
         </Link>
       </div>
@@ -174,26 +141,12 @@ export const Header = ({
                 pNodes
               </Button>
             </Link>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant={location.pathname.startsWith('/nodes') ? "secondary" : "ghost"} size="sm" className="gap-2">
-                  <FileCode className="w-4 h-4" />
-                  Block Nodes
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className="w-48">
-                <Link to="/nodes/inspector">
-                  <DropdownMenuItem className="cursor-pointer">
-                    Node Inspector
-                  </DropdownMenuItem>
-                </Link>
-                <Link to="/nodes/data-flow">
-                  <DropdownMenuItem className="cursor-pointer">
-                    Data Flow Visual
-                  </DropdownMenuItem>
-                </Link>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <Link to="/nodes/inspector">
+              <Button variant={location.pathname.startsWith('/nodes') ? "secondary" : "ghost"} size="sm" className="gap-2">
+                <Activity className="w-4 h-4" />
+                Node Inspector
+              </Button>
+            </Link>
           </nav>
 
           <div className="w-full max-w-xs lg:max-w-sm">
@@ -216,7 +169,6 @@ export const Header = ({
                 <BookOpen className="h-4 w-4" />
               </a>
             </Button>
-            <OverviewModal />
           </div>
 
           {lastUpdated && (
