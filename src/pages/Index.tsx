@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Header } from '@/components/Header';
 import { NetworkStats } from '@/components/NetworkStats';
 import { PNodeGrid } from '@/components/PNodeGrid';
@@ -13,50 +14,32 @@ import { GossipFeed } from '@/components/GossipFeed';
 import { ComparisonModal } from '@/components/ComparisonModal';
 
 const Index = () => {
-  const [nodes, setNodes] = useState<PNode[]>([]);
   const [selectedNode, setSelectedNode] = useState<PNode | null>(null);
   const [compareNode, setCompareNode] = useState<PNode | null>(null);
   const [isCompareOpen, setIsCompareOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const { toast } = useToast();
 
-  const fetchPNodes = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const fetchedNodes = await prpcService.getAllPNodes();
-      setNodes(fetchedNodes);
-      setLastUpdated(new Date());
+  const { data: nodes = [], isLoading, error, refetch } = useQuery({
+    queryKey: ['pnodes'],
+    queryFn: () => prpcService.getAllPNodes(),
+    refetchInterval: 10000, // 10 seconds refresh
+  });
 
-      if (fetchedNodes.length === 0) {
-        toast({
-          title: 'No nodes found',
-          description: 'Unable to discover any pNodes from seed IPs.',
-          variant: 'destructive',
-        });
-      }
-    } catch (error) {
-      console.error('Failed to fetch pNodes:', error);
+  const lastUpdated = new Date(); // Simplified for now, TanStack Query handles this internally
+
+  useEffect(() => {
+    if (error) {
       toast({
         title: 'Error fetching pNodes',
         description: 'Failed to connect to pRPC network. Please try again.',
         variant: 'destructive',
       });
-    } finally {
-      setIsLoading(false);
     }
-  }, [toast]);
-
-  // Initial fetch on mount and interval
-  useEffect(() => {
-    fetchPNodes();
-    const interval = setInterval(fetchPNodes, 10000); // 10 seconds refresh
-    return () => clearInterval(interval);
-  }, [fetchPNodes]);
+  }, [error, toast]);
 
   const handleRefresh = useCallback(() => {
-    fetchPNodes();
-  }, [fetchPNodes]);
+    refetch();
+  }, [refetch]);
 
   const handleSelectNode = useCallback((node: PNode) => {
     setSelectedNode(node);
@@ -90,7 +73,9 @@ const Index = () => {
 
       <main className="flex-1 flex relative">
         <div className={`flex-1 p-6 space-y-6 transition-all ${selectedNode ? 'lg:mr-[480px]' : ''}`}>
-          <NetworkStats nodes={nodes} />
+          <div className="mb-6">
+            <NetworkStats nodes={nodes} />
+          </div>
 
           <HistoricalCharts nodes={nodes} />
 

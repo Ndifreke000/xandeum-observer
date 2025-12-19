@@ -16,11 +16,13 @@ export const NetworkStats = ({ nodes }: NetworkStatsProps) => {
 
   // Calculate Total Storage (Sum of Used Storage)
   const totalStorageBytes = nodes.reduce((acc, n) => acc + (n.storage?.used || 0), 0);
+  const totalCommittedBytes = nodes.reduce((acc, n) => acc + (n.storage?.committed || 0), 0);
+  const saturation = totalCommittedBytes > 0 ? (totalStorageBytes / totalCommittedBytes) * 100 : 0;
 
   const formatBytes = (bytes: number) => {
     if (bytes === 0) return '0 B';
     const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
@@ -55,6 +57,17 @@ export const NetworkStats = ({ nodes }: NetworkStatsProps) => {
       bg: 'bg-blue-500/10',
     },
     {
+      label: 'Storage Heat',
+      value: formatBytes(totalCommittedBytes),
+      icon: Database,
+      color: 'text-cyan-500',
+      subtext: 'Total Capacity',
+      bg: 'bg-cyan-500/10',
+      badge: saturation > 80 ? 'HIGH' : 'OPTIMAL',
+      badgeColor: saturation > 80 ? 'text-rose-500 bg-rose-500/10 border-rose-500/20' : 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20',
+      extraSubtext: `${saturation.toFixed(2)}% Saturation`
+    },
+    {
       label: 'Network Stability',
       value: `${networkStability}%`,
       icon: Activity,
@@ -81,7 +94,7 @@ export const NetworkStats = ({ nodes }: NetworkStatsProps) => {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
       {stats.map((stat) => (
         <Card key={stat.label} className="border border-border/50 shadow-premium overflow-hidden relative group bg-card hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-default">
           <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-transparent via-transparent to-${stat.color.split('-')[1]}-500/5`} />
@@ -95,6 +108,11 @@ export const NetworkStats = ({ nodes }: NetworkStatsProps) => {
                     <span className="text-[10px] font-bold text-green-500 tracking-tighter">LIVE</span>
                   </div>
                 )}
+                {stat.badge && (
+                  <div className={`px-1.5 py-0.5 rounded border text-[10px] font-bold ${stat.badgeColor}`}>
+                    {stat.badge}
+                  </div>
+                )}
               </div>
               <div className={`p-2 rounded-lg ${stat.bg}`}>
                 <stat.icon className={`h-5 w-5 ${stat.color}`} />
@@ -102,12 +120,14 @@ export const NetworkStats = ({ nodes }: NetworkStatsProps) => {
             </div>
             <div>
               <div className="text-3xl font-bold tracking-tight">{stat.value}</div>
-              {stat.subtext && <p className="text-xs text-muted-foreground mt-1">{stat.subtext}</p>}
+              <p className="text-xs text-muted-foreground mt-1">
+                {stat.subtext} {stat.extraSubtext && <span>• <span className="text-primary/80">{stat.extraSubtext}</span></span>}
+              </p>
             </div>
           </CardContent>
         </Card>
       ))}
-      <Card className="lg:col-span-4 border border-border/50 shadow-premium bg-card/50 backdrop-blur-sm">
+      <Card className="lg:col-span-5 border border-border/50 shadow-premium bg-card/50 backdrop-blur-sm">
         <CardContent className="p-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="p-2 bg-blue-500/10 rounded-lg">

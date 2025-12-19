@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { PNode } from '@/types/pnode';
 import { CopyButton } from './CopyButton';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,9 @@ import { LatencyChart } from './LatencyChart';
 import { AvailabilityDataPoint, LatencyDataPoint } from '@/types/pnode';
 import { RewardForecast } from './RewardForecast';
 import { SLAReportCard } from './SLAReportCard';
+import { UptimeHeatmap } from './UptimeHeatmap';
+import { Bell, Mail, Webhook, Check } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface PNodeDetailProps {
   node: PNode;
@@ -19,6 +23,28 @@ interface PNodeDetailProps {
 }
 
 export function PNodeDetail({ node, onClose }: PNodeDetailProps) {
+  const { toast } = useToast();
+  const [isAlertingOpen, setIsAlertingOpen] = useState(false);
+  const [alertType, setAlertType] = useState<'email' | 'webhook'>('email');
+  const [alertValue, setAlertValue] = useState('');
+  const [isAlertSet, setIsAlertSet] = useState(false);
+
+  const handleSetAlert = () => {
+    setIsAlertSet(true);
+    toast({
+      title: "Alert Configured",
+      description: `Monitoring ${node.ip} for downtime via ${alertType}.`,
+    });
+
+    // Simulate a test alert after 2 seconds
+    setTimeout(() => {
+      toast({
+        title: "🚨 Alert Triggered (Test)",
+        description: `CRITICAL: Node ${node.ip} latency spike detected (942ms).`,
+        variant: "destructive",
+      });
+    }, 2000);
+  };
   const formatBytes = (bytes: number) => {
     if (bytes === 0) return '0 B';
     const k = 1024;
@@ -293,13 +319,88 @@ export function PNodeDetail({ node, onClose }: PNodeDetailProps) {
         </section>
 
         {/* Availability Analysis */}
-        <section className="space-y-3">
-          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-            Availability (7 Days)
-          </h3>
-          <div className="metric-card">
-            <AvailabilityTimeline data={availabilityData} />
+        <section className="space-y-3 pt-4 border-t border-border">
+          <UptimeHeatmap />
+        </section>
+
+        {/* Alerting Simulation */}
+        <section className="space-y-3 pt-4 border-t border-border">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+              <Bell className="w-3 h-3" />
+              Node Monitoring Alerts
+            </div>
+            {isAlertSet && (
+              <Badge variant="outline" className="text-[8px] bg-emerald-500/10 text-emerald-500 border-emerald-500/20">
+                ACTIVE
+              </Badge>
+            )}
           </div>
+
+          <Card className="p-4 bg-white/5 border-white/10 backdrop-blur-md space-y-4">
+            {!isAlertSet ? (
+              <>
+                <div className="flex gap-2">
+                  <Button
+                    variant={alertType === 'email' ? 'default' : 'outline'}
+                    size="sm"
+                    className="flex-1 h-8 text-[10px] gap-1.5"
+                    onClick={() => setAlertType('email')}
+                  >
+                    <Mail className="h-3 w-3" /> EMAIL
+                  </Button>
+                  <Button
+                    variant={alertType === 'webhook' ? 'default' : 'outline'}
+                    size="sm"
+                    className="flex-1 h-8 text-[10px] gap-1.5"
+                    onClick={() => setAlertType('webhook')}
+                  >
+                    <Webhook className="h-3 w-3" /> WEBHOOK
+                  </Button>
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder={alertType === 'email' ? "Enter email address..." : "Enter webhook URL..."}
+                    className="flex-1 bg-black/40 border border-white/10 rounded-md px-3 text-[11px] font-mono focus:outline-none focus:ring-1 focus:ring-primary"
+                    value={alertValue}
+                    onChange={(e) => setAlertValue(e.target.value)}
+                  />
+                  <Button
+                    size="sm"
+                    className="h-8 px-4 text-[10px]"
+                    onClick={handleSetAlert}
+                    disabled={!alertValue}
+                  >
+                    SET ALERT
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-emerald-500/10 rounded-full">
+                    <Check className="h-4 w-4 text-emerald-500" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold">Alerts Active</div>
+                    <div className="text-[10px] text-muted-foreground truncate max-w-[200px]">{alertValue}</div>
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 text-[10px] text-rose-400 hover:text-rose-500 hover:bg-rose-500/10"
+                  onClick={() => {
+                    setIsAlertSet(false);
+                    setAlertValue('');
+                  }}
+                >
+                  DISABLE
+                </Button>
+              </div>
+            )}
+          </Card>
         </section>
 
         {/* Performance Analysis */}

@@ -131,6 +131,27 @@ async fn fetch_geo(ip: String) -> Option<GeoData> {
     None
 }
 
+async fn check_seed_health(ip: &str) -> bool {
+    let client = reqwest::Client::new();
+    let url = format!("http://{}:6000/rpc", ip);
+    let body = serde_json::json!({
+        "jsonrpc": "2.0",
+        "method": "get-pods-with-stats",
+        "id": 1
+    });
+
+    match client.post(&url)
+        .header("Content-Type", "application/json")
+        .json(&body)
+        .timeout(std::time::Duration::from_secs(2))
+        .send()
+        .await 
+    {
+        Ok(resp) => resp.status().is_success(),
+        Err(_) => false,
+    }
+}
+
 async fn call_rpc_get_pods() -> Result<Vec<PodRaw>, String> {
     let client = reqwest::Client::new();
     
@@ -140,6 +161,46 @@ async fn call_rpc_get_pods() -> Result<Vec<PodRaw>, String> {
         seeds.shuffle(&mut rng);
     }
 
+    // First pass: Try seeds that respond to a quick health check
+    for ip in &seeds {
+        if check_seed_health(ip).await {
+            let url = format!("http://{}:6000/rpc", ip);
+            let body = serde_json::json!({
+                "jsonrpc": "2.0",
+                "method": "get-pods-with-stats",
+                "id": 1
+            });
+
+            match client.post(&url)
+                .header("Content-Type", "application/json")
+                .json(&body)
+                .timeout(std::time::Duration::from_secs(5))
+                .send()
+                .await 
+            {
+                Ok(resp) => {
+                    if let Ok(json) = resp.json::<serde_json::Value>().await {
+                        if let Some(result) = json.get("result") {
+                             if let Ok(pods) = serde_json::from_value::<Vec<PodRaw>>(result.clone()) {
+                                 return Ok(pods);
+                             }
+                             if let Some(pods_val) = result.get("pods") {
+                                 if let Ok(pods) = serde_json::from_value::<Vec<PodRaw>>(pods_val.clone()) {
+                                     return Ok(pods);
+                                 }
+                             }
+                        }
+                    }
+                }
+                Err(e) => {
+                    println!("Failed to fetch from healthy seed {}: {}", ip, e);
+                    continue;
+                }
+            }
+        }
+    }
+
+    // Second pass: Try all seeds if no "healthy" ones worked
     for ip in seeds {
         let url = format!("http://{}:6000/rpc", ip);
         let body = serde_json::json!({

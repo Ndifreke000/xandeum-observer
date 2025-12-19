@@ -12,17 +12,23 @@ Xandeum Network Observer is a world-class monitoring platform designed to provid
 
 ## ✨ Key Innovations
 
-### 📡 Live Gossip Feed
-Experience the network in real-time. Our custom gossip listener tracks node discoveries, status changes, and storage events as they happen, providing a "live pulse" of the network.
-
 ### 🌍 3D Geospatial Intelligence
 Visualize the global footprint of Xandeum. Our interactive 3D globe maps pNodes to their physical locations, providing a clear view of network decentralization and density.
 
-### ⌨️ Command Palette (⌘K)
-Navigate the network at light speed. Our integrated command palette allows for instant searching of nodes by IP, ID, or location, making troubleshooting and analysis effortless.
+### 📡 Live Gossip Feed (Terminal Mode)
+Experience the network in real-time. Our custom gossip listener tracks node discoveries, status changes, and storage events in a high-fidelity terminal interface.
 
-### 🧪 Storage Simulator
-Bridging the gap for dApp developers. Simulate storage costs and performance metrics for smart contracts on Xandeum's unique exabyte-scale layer.
+### 🔍 Node Inspector & SLA Verification
+Deep-dive into any pNode. Our inspector provides:
+- **SLA Report Card**: Real-time verification against network reliability guarantees.
+- **Reward Forecast**: Estimated STOINC earnings based on uptime, rank, and storage contribution.
+- **Achievement System**: Visual badges for "Uptime Kings," "Latency Legends," and "Storage Giants."
+
+### ⌨️ Command Palette (⌘K)
+Navigate the network at light speed. Instant search for nodes by IP, ID, or location, making troubleshooting and analysis effortless.
+
+### 🏆 Network Leaderboard
+Track the top-performing nodes in the network based on STOINC rewards and storage commitment.
 
 ---
 
@@ -70,8 +76,8 @@ npm run dev
 
 Unlike basic dashboards, the Xandeum Observer focuses on **Clarity** and **Innovation**:
 - **Zero Mock Data**: Every metric is pulled directly from the pRPC gossip network.
-- **Deep Space Aesthetics**: A premium "Deep Space" theme designed for professional monitoring environments.
-- **Developer First**: Built-in tools for contract simulation and raw JSON inspection.
+- **Deep Space Aesthetics**: A premium theme designed for professional monitoring environments.
+- **Economic Intelligence**: Built-in tools for reward forecasting and capacity planning.
 
 ---
 
