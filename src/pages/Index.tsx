@@ -10,10 +10,13 @@ import GlobeVisualization from '@/components/GlobeVisualization';
 import { HistoricalCharts } from '@/components/HistoricalCharts';
 import { Leaderboard } from '@/components/Leaderboard';
 import { GossipFeed } from '@/components/GossipFeed';
+import { ComparisonModal } from '@/components/ComparisonModal';
 
 const Index = () => {
   const [nodes, setNodes] = useState<PNode[]>([]);
   const [selectedNode, setSelectedNode] = useState<PNode | null>(null);
+  const [compareNode, setCompareNode] = useState<PNode | null>(null);
+  const [isCompareOpen, setIsCompareOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const { toast } = useToast();
@@ -63,6 +66,18 @@ const Index = () => {
     setSelectedNode(null);
   }, []);
 
+  const handleCompareNode = useCallback((node: PNode) => {
+    if (selectedNode && selectedNode.id !== node.id) {
+      setCompareNode(node);
+      setIsCompareOpen(true);
+    } else {
+      toast({
+        title: 'Select a base node first',
+        description: 'Click on a node to view its details, then click "Compare" on another node.',
+      });
+    }
+  }, [selectedNode, toast]);
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header
@@ -83,19 +98,20 @@ const Index = () => {
 
           <div className="mb-6">
             <GlobeVisualization nodes={nodes} />
+          </div>
 
-            <div className="border-t-2 border-border/60 pt-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-medium">pNode Registry</h2>
-                <span className="text-sm text-muted-foreground">{nodes.length} Nodes Discovered</span>
-              </div>
-
-              <PNodeGrid
-                nodes={nodes}
-                onSelectNode={handleSelectNode}
-                selectedNodeId={selectedNode?.id}
-              />
+          <div className="border-t-2 border-border/60 pt-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium">pNode Registry</h2>
+              <span className="text-sm text-muted-foreground">{nodes.length} Nodes Discovered</span>
             </div>
+
+            <PNodeGrid
+              nodes={nodes}
+              onSelectNode={handleSelectNode}
+              onCompareNode={handleCompareNode}
+              selectedNodeId={selectedNode?.id}
+            />
           </div>
         </div>
 
@@ -103,6 +119,15 @@ const Index = () => {
           <div className="fixed inset-0 lg:inset-auto lg:right-0 lg:top-14 lg:bottom-0 lg:w-[480px] shadow-2xl z-50 bg-background/95 backdrop-blur-sm lg:backdrop-blur-none">
             <PNodeDetail node={selectedNode} onClose={handleCloseDetail} />
           </div>
+        )}
+
+        {selectedNode && compareNode && (
+          <ComparisonModal
+            nodeA={selectedNode}
+            nodeB={compareNode}
+            isOpen={isCompareOpen}
+            onClose={() => setIsCompareOpen(false)}
+          />
         )}
       </main>
     </div>

@@ -21,6 +21,7 @@ export function SignalsList({ signals }: SignalsListProps) {
       case 'latency_spike': return Clock;
       case 'inactivity': return AlertCircle;
       case 'gossip_dropout': return Radio;
+      default: return AlertTriangle;
     }
   };
 
@@ -35,24 +36,23 @@ export function SignalsList({ signals }: SignalsListProps) {
         return (
           <div
             key={index}
-            className={`flex items-start gap-3 p-2.5 rounded-md border ${
-              signal.severity === 'critical' 
-                ? 'bg-status-offline/5 border-status-offline/20' 
+            className={`flex items-start gap-3 p-2.5 rounded-md border ${signal.severity === 'critical'
+                ? 'bg-status-offline/5 border-status-offline/20'
                 : 'bg-status-unstable/5 border-status-unstable/20'
-            }`}
+              }`}
           >
-            <Icon className={`h-4 w-4 mt-0.5 shrink-0 ${
-              signal.severity === 'critical' ? 'text-status-offline' : 'text-status-unstable'
-            }`} />
+            <Icon className={`h-4 w-4 mt-0.5 shrink-0 ${signal.severity === 'critical' ? 'text-status-offline' : 'text-status-unstable'
+              }`} />
             <div className="flex-1 min-w-0">
               <p className="text-sm">{signal.message}</p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                {formatDistanceToNow(new Date(signal.timestamp), { addSuffix: true })}
+                {signal.timestamp && !isNaN(new Date(signal.timestamp).getTime())
+                  ? formatDistanceToNow(new Date(signal.timestamp), { addSuffix: true })
+                  : 'N/A'}
               </p>
             </div>
-            <span className={`text-xs font-medium uppercase ${
-              signal.severity === 'critical' ? 'text-status-offline' : 'text-status-unstable'
-            }`}>
+            <span className={`text-xs font-medium uppercase ${signal.severity === 'critical' ? 'text-status-offline' : 'text-status-unstable'
+              }`}>
               {signal.severity}
             </span>
           </div>

@@ -34,10 +34,31 @@ export interface NodeStorageData {
     usagePercent: number;
 }
 
+export interface NodeTrafficData {
+    totalRequests: number;
+    averageRequestsPerHour: number;
+    classification: 'burst' | 'steady' | 'sporadic';
+    timeBuckets: {
+        timestamp: string;
+        requestCount: number;
+        inboundBytes: number;
+        outboundBytes: number;
+    }[];
+}
+
+export interface NodeIOData {
+    totalInbound: number;
+    totalOutbound: number;
+    ioRatio: number;
+    classification: 'inbound-heavy' | 'outbound-heavy' | 'balanced';
+}
+
 export interface NodeAnalysis {
     nodeId: string;
     generatedAt: string;
     identity: NodeIdentityData;
     performance: NodePerformanceData;
     storage?: NodeStorageData;
+    traffic?: NodeTrafficData;
+    io?: NodeIOData;
 }

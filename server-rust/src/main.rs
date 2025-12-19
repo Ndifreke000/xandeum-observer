@@ -45,8 +45,8 @@ async fn main() {
 
     let app = Router::new()
         .route("/pods", get(get_pods))
-        .route("/node/{id}", get(get_node))
-        .route("/node/{id}/history", get(get_node_history_handler))
+        .route("/node/:id", get(get_node))
+        .route("/node/:id/history", get(get_node_history_handler))
         .route("/history", get(get_history))
         .route("/credits", get(get_credits))
         .layer(CorsLayer::permissive());

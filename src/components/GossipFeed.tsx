@@ -54,7 +54,15 @@ export function GossipFeed({ nodes, className }: GossipFeedProps) {
                 newEvents.push({
                     id: Math.random().toString(36).substr(2, 9),
                     type: 'status_change',
-                    message: `EVENT: Node ${node.id.slice(0, 12)} status changed to [${node.status.toUpperCase()}]`,
+                    message: `ANOMALY: Node ${node.id.slice(0, 12)} status changed to [${node.status.toUpperCase()}]`,
+                    timestamp: new Date(),
+                    nodeId: node.id
+                });
+            } else if (node.metrics.latency > 500 && prevNode.metrics.latency <= 500) {
+                newEvents.push({
+                    id: Math.random().toString(36).substr(2, 9),
+                    type: 'status_change',
+                    message: `ANOMALY: Latency spike detected on ${node.id.slice(0, 12)}... (${node.metrics.latency}ms)`,
                     timestamp: new Date(),
                     nodeId: node.id
                 });

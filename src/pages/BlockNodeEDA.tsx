@@ -237,7 +237,7 @@ export default function BlockNodeEDA() {
                         </div>
 
                         {/* Raw Data Inspector (Honest Deep Dive) */}
-                        <Card className="p-6">
+                        <Card className="p-6 h-full">
                             <div className="flex items-center justify-between mb-4">
                                 <h2 className="text-lg font-semibold flex items-center gap-2">
                                     <FileCode className="h-5 w-5 text-muted-foreground" />
@@ -247,8 +247,8 @@ export default function BlockNodeEDA() {
                                     Direct from pRPC
                                 </span>
                             </div>
-                            <div className="bg-muted/50 rounded-lg p-4 overflow-x-auto max-h-[300px] custom-scrollbar">
-                                <pre className="text-xs font-mono text-muted-foreground">
+                            <div className="bg-muted/50 rounded-lg p-4 overflow-x-auto max-h-[500px] custom-scrollbar">
+                                <pre className="text-xs font-mono text-muted-foreground whitespace-pre-wrap break-all">
                                     {JSON.stringify(analysis, null, 2)}
                                 </pre>
                             </div>

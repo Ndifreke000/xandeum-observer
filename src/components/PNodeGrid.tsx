@@ -18,13 +18,14 @@ import {
 interface PNodeGridProps {
     nodes: PNode[];
     onSelectNode: (node: PNode) => void;
+    onCompareNode: (node: PNode) => void;
     selectedNodeId?: string;
 }
 
 type SortOption = 'rank' | 'credits' | 'storage' | 'health';
 type StatusFilter = 'all' | 'online' | 'unstable' | 'offline';
 
-export function PNodeGrid({ nodes, onSelectNode, selectedNodeId }: PNodeGridProps) {
+export function PNodeGrid({ nodes, onSelectNode, onCompareNode, selectedNodeId }: PNodeGridProps) {
     const [sortBy, setSortBy] = useState<SortOption>('rank');
     const [filterStatus, setFilterStatus] = useState<StatusFilter>('all');
 
@@ -185,9 +186,25 @@ export function PNodeGrid({ nodes, onSelectNode, selectedNodeId }: PNodeGridProp
                                         <span className={`font-bold ${getHealthColor(node.health.total)}`}>{node.health.total}/100</span>
                                     </div>
                                 </div>
-                                <div className="flex flex-col items-end">
+                                <div className="flex flex-col items-end gap-2">
                                     <span className="text-[10px] text-muted-foreground">Last Seen</span>
-                                    <span className="text-foreground/80">{formatDistanceToNow(new Date(node.metrics.lastSeen), { addSuffix: true })}</span>
+                                    <span className="text-foreground/80">
+                                        {node.metrics.lastSeen && !isNaN(new Date(node.metrics.lastSeen).getTime())
+                                            ? formatDistanceToNow(new Date(node.metrics.lastSeen), { addSuffix: true })
+                                            : 'N/A'}
+                                    </span>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-7 px-2 text-[10px] gap-1 hover:bg-primary/10 hover:text-primary"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onCompareNode(node);
+                                        }}
+                                    >
+                                        <Activity className="w-3 h-3" />
+                                        Compare
+                                    </Button>
                                 </div>
                             </div>
                         </CardContent>

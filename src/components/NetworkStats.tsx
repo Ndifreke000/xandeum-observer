@@ -1,6 +1,6 @@
 import { PNode } from '@/types/pnode';
 import { Card, CardContent } from '@/components/ui/card';
-import { Server, Activity, Database, GitBranch, HardDrive } from 'lucide-react';
+import { Server, Activity, Database, GitBranch, HardDrive, Globe } from 'lucide-react';
 
 interface NetworkStatsProps {
   nodes: PNode[];
@@ -33,6 +33,17 @@ export const NetworkStats = ({ nodes }: NetworkStatsProps) => {
   }, {} as Record<string, number>);
 
   const consensusVersion = Object.entries(versionCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'Unknown';
+
+  // Regional Breakdown
+  const regions = nodes.reduce((acc, n) => {
+    const region = n.geo?.country || 'Unknown';
+    acc[region] = (acc[region] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const topRegions = Object.entries(regions)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3);
 
   const stats = [
     {
@@ -96,6 +107,29 @@ export const NetworkStats = ({ nodes }: NetworkStatsProps) => {
           </CardContent>
         </Card>
       ))}
+      <Card className="lg:col-span-4 border border-border/50 shadow-premium bg-card/50 backdrop-blur-sm">
+        <CardContent className="p-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="p-2 bg-blue-500/10 rounded-lg">
+              <Globe className="h-4 w-4 text-blue-500" />
+            </div>
+            <div>
+              <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Regional Distribution</div>
+              <div className="flex gap-4 mt-1">
+                {topRegions.map(([region, count]) => (
+                  <div key={region} className="flex items-center gap-1.5">
+                    <span className="text-xs font-medium">{region}:</span>
+                    <span className="text-xs font-mono font-bold text-primary">{count}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="text-[10px] text-muted-foreground italic">
+            Requirement 8: Ecosystem Health & Network Growth Visibility
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

@@ -29,6 +29,18 @@ const GlobeVisualization = ({ nodes }: GlobeVisualizationProps) => {
         return () => window.removeEventListener('resize', updateDimensions);
     }, []);
 
+    // Generate topology arcs (connect some nodes to simulate network flow)
+    const arcData = geolocatedNodes.length > 1 ? geolocatedNodes.slice(0, 15).map((node, i) => {
+        const nextNode = geolocatedNodes[(i + 1) % Math.min(geolocatedNodes.length, 15)];
+        return {
+            startLat: node.geo!.lat,
+            startLng: node.geo!.lon,
+            endLat: nextNode.geo!.lat,
+            endLng: nextNode.geo!.lon,
+            color: ['#3b82f6', '#8b5cf6', '#ec4899'][i % 3]
+        };
+    }) : [];
+
     useEffect(() => {
         // Filter nodes with valid geo data
         const validNodes = nodes.filter(n => n.geo && n.geo.lat !== 0 && n.geo.lon !== 0);
@@ -57,18 +69,27 @@ const GlobeVisualization = ({ nodes }: GlobeVisualizationProps) => {
                     height={dimensions.height}
                     globeImageUrl="//unpkg.com/three-globe/example/img/earth-night.jpg"
                     backgroundImageUrl="//unpkg.com/three-globe/example/img/night-sky.png"
+
                     pointsData={geolocatedNodes}
                     pointLat={(d: object) => (d as PNode).geo?.lat || 0}
                     pointLng={(d: object) => (d as PNode).geo?.lon || 0}
-                    pointColor={() => '#10b981'} // Emerald-500
-                    pointAltitude={0.1}
-                    pointRadius={0.5}
-                    pointsMerge={true}
+                    pointColor={(d: object) => (d as PNode).status === 'online' ? '#10b981' : '#f59e0b'}
+                    pointAltitude={0.01}
+                    pointRadius={0.4}
+                    pointsMerge={false}
+
+                    arcsData={arcData}
+                    arcColor="color"
+                    arcDashLength={0.4}
+                    arcDashGap={2}
+                    arcDashAnimateTime={2000}
+                    arcStroke={0.2}
+
                     pointLabel={(d: object) => `
-                        <div style="background: rgba(0,0,0,0.8); padding: 8px; border-radius: 4px; color: white; font-family: sans-serif;">
+                        <div style="background: rgba(0,0,0,0.8); padding: 8px; border-radius: 4px; color: white; font-family: sans-serif; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(4px);">
                             <b style="color: #10b981;">${(d as PNode).ip}</b><br/>
-                            ${(d as PNode).geo?.city}, ${(d as PNode).geo?.country}<br/>
-                            Uptime: ${(d as PNode).metrics.uptime.toFixed(1)}%
+                            <span style="font-size: 10px; color: #94a3b8;">${(d as PNode).geo?.city}, ${(d as PNode).geo?.country}</span><br/>
+                            <span style="font-size: 10px; color: #94a3b8;">Uptime: ${(d as PNode).metrics.uptime.toFixed(1)}%</span>
                         </div>
                     `}
                 />

@@ -29,7 +29,7 @@ export function NodePerformanceSignals({ analysis }: NodePerformanceSignalsProps
     };
 
     return (
-        <Card className="p-6 flex flex-col h-[400px]">
+        <Card className="p-6 flex flex-col h-full min-h-[400px]">
             <div className="flex items-center justify-between mb-6">
                 <div>
                     <h2 className="text-lg font-semibold flex items-center gap-2">
