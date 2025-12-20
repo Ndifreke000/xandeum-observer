@@ -66,7 +66,7 @@ class SLAVerificationService {
       const startTime = endTime - timeRange;
 
       // Use real historical data to create proof records
-      historyData.forEach((record: { timestamp: number; status: string; [key: string]: unknown }, index: number) => {
+      historyData.forEach((record: { timestamp: number; status: string; [key: string]: unknown }) => {
         if (record.timestamp * 1000 >= startTime && record.timestamp * 1000 <= endTime) {
           // Generate proof hash based on real data
           const proofData = `${nodeId}-${record.timestamp}-${record.status}`;
@@ -134,8 +134,8 @@ class SLAVerificationService {
     // Calculate real uptime percentage from historical data
     let uptimePercentage = node.metrics.uptime;
     if (realHistoricalData.length > 0) {
-      const onlineRecords = realHistoricalData.filter((record: { status: string; latency_ms: number | null; [key: string]: unknown }) => 
-        record.status === 'online' || record.latency_ms !== null
+      const onlineRecords = realHistoricalData.filter((record) => 
+        record.status === 'online' || (record.latency_ms !== undefined && record.latency_ms !== null)
       );
       uptimePercentage = (onlineRecords.length / realHistoricalData.length) * 100;
     }
@@ -154,9 +154,14 @@ class SLAVerificationService {
     // Calculate real average latency from historical data
     let averageLatency = node.metrics.latency;
     if (realHistoricalData.length > 0) {
-      const latencyRecords = realHistoricalData.filter((record: { latency_ms: number | null; [key: string]: unknown }) => record.latency_ms !== null);
+      const latencyRecords = realHistoricalData.filter((record) => 
+        record.latency_ms !== undefined && record.latency_ms !== null
+      );
       if (latencyRecords.length > 0) {
-        const totalLatency = latencyRecords.reduce((sum: number, record: { latency_ms: number; [key: string]: unknown }) => sum + record.latency_ms, 0);
+        const totalLatency = latencyRecords.reduce((sum, record) => {
+          const latency = typeof record.latency_ms === 'number' ? record.latency_ms : 0;
+          return sum + latency;
+        }, 0);
         averageLatency = totalLatency / latencyRecords.length;
       }
     }
@@ -254,27 +259,15 @@ class SLAVerificationService {
   }
 
   /**
-   * Parse proof data from RPC response (no longer needed but kept for compatibility)
-   */
-  private parseProofData(rawData: Record<string, unknown>, nodeId: string): StorageProof[] {
-    // This method is no longer used since we're getting real data from RPC
-    return [];
-  }
-
-  /**
    * Verify the cryptographic integrity of a storage proof using real data
    */
-  private async verifyProofIntegrity(proof: StorageProof): Promise<boolean> {
+  async verifyProofIntegrity(proof: StorageProof): Promise<boolean> {
     try {
       // Real verification based on actual proof data
       const isValidHash = proof.proofHash.length === 64; // SHA-256 hash length
       const isValidMerkle = proof.merkleRoot.length === 64;
       const isRecentProof = Date.now() - proof.timestamp < 7 * 24 * 60 * 60 * 1000; // Within 7 days
       const hasValidStorage = proof.storageCommitted > 0 || proof.storageUsed >= 0;
-      
-      // Additional verification: check if proof hash matches expected pattern
-      const expectedHash = this.generateProofHash(`${proof.nodeId}-${proof.timestamp}-verified`);
-      const hashMatches = proof.proofHash === expectedHash;
       
       return isValidHash && isValidMerkle && isRecentProof && hasValidStorage;
     } catch (error) {

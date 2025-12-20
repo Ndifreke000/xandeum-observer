@@ -285,8 +285,16 @@ class Web3AlertsService {
     try {
       const message = `🚨 ${alert.title}\n\n${alert.message}\n\nTime: ${new Date(alert.timestamp).toLocaleString()}`;
       
+      // Type-safe XMTP client access
+      const client = this.xmtpClient as { conversations?: { newConversation?: (address: string) => Promise<{ send: (msg: string) => Promise<void> }> } };
+      
+      if (!client.conversations?.newConversation) {
+        console.warn('XMTP client not properly initialized');
+        return false;
+      }
+      
       for (const address of this.subscribedAddresses) {
-        const conversation = await this.xmtpClient.conversations.newConversation(address);
+        const conversation = await client.conversations.newConversation(address);
         await conversation.send(message);
       }
       

@@ -137,7 +137,7 @@ class RewardOptimizationEngine {
     const suggestions: OptimizationSuggestion[] = [];
 
     // Get real historical data for analysis
-    let historicalData: Array<{ timestamp: number; status: string; latency_ms: number | null; [key: string]: unknown }> = [];
+    let historicalData: Array<{ timestamp: number; status: string; latency_ms?: number | null; [key: string]: unknown }> = [];
     try {
       const response = await fetch(`${API_BASE_URL}/node/${node.id}/history`);
       if (response.ok) {
@@ -259,14 +259,20 @@ class RewardOptimizationEngine {
   /**
    * Analyze node performance for optimization opportunities using real data
    */
-  private analyzeNodePerformance(node: PNode, slaMetrics: SLAMetrics, historicalData: Array<{ timestamp: number; status: string; latency_ms: number | null; [key: string]: unknown }>) {
+  private analyzeNodePerformance(
+    node: PNode, 
+    slaMetrics: SLAMetrics, 
+    historicalData: Array<{ timestamp: number; status: string; latency_ms?: number | null; [key: string]: unknown }>
+  ) {
     const issues = [];
     let needsImprovement = false;
 
     // Real uptime analysis from historical data
     let realUptimeScore = node.metrics.uptime;
     if (historicalData.length > 0) {
-      const onlineRecords = historicalData.filter(record => record.status === 'online' || record.latency_ms !== null);
+      const onlineRecords = historicalData.filter(record => 
+        record.status === 'online' || (record.latency_ms !== undefined && record.latency_ms !== null)
+      );
       realUptimeScore = (onlineRecords.length / historicalData.length) * 100;
     }
 
@@ -278,9 +284,14 @@ class RewardOptimizationEngine {
     // Real latency analysis from historical data
     let realLatencyScore = node.metrics.latency;
     if (historicalData.length > 0) {
-      const latencyRecords = historicalData.filter(record => record.latency_ms !== null);
+      const latencyRecords = historicalData.filter(record => 
+        record.latency_ms !== undefined && record.latency_ms !== null
+      );
       if (latencyRecords.length > 0) {
-        const avgLatency = latencyRecords.reduce((sum, record) => sum + record.latency_ms, 0) / latencyRecords.length;
+        const avgLatency = latencyRecords.reduce((sum, record) => {
+          const latency = typeof record.latency_ms === 'number' ? record.latency_ms : 0;
+          return sum + latency;
+        }, 0) / latencyRecords.length;
         realLatencyScore = avgLatency;
       }
     }
@@ -309,7 +320,9 @@ class RewardOptimizationEngine {
   /**
    * Calculate performance trend from real historical data
    */
-  private calculatePerformanceTrend(historicalData: Array<{ timestamp: number; status: string; latency_ms: number | null; [key: string]: unknown }>): 'improving' | 'stable' | 'declining' {
+  private calculatePerformanceTrend(
+    historicalData: Array<{ timestamp: number; status: string; latency_ms?: number | null; [key: string]: unknown }>
+  ): 'improving' | 'stable' | 'declining' {
     if (historicalData.length < 10) return 'stable';
     
     const recentData = historicalData.slice(0, Math.floor(historicalData.length / 3));
@@ -330,7 +343,13 @@ class RewardOptimizationEngine {
    */
   private analyzeLocationOptimization(node: PNode, networkData: PNode[]) {
     if (!node.geo) {
-      return { hasOpportunity: false, reason: 'no_geo_data' };
+      return { 
+        hasOpportunity: false, 
+        reason: 'no_geo_data',
+        density: 0,
+        avgPerformance: 0,
+        recommendation: 'no_action'
+      };
     }
 
     // Calculate node density in the region
@@ -384,7 +403,10 @@ class RewardOptimizationEngine {
   /**
    * Generate performance improvement suggestions
    */
-  private generatePerformanceSuggestions(node: PNode, analysis: { needsImprovement: boolean; issues: string[]; [key: string]: unknown }): OptimizationSuggestion[] {
+  private generatePerformanceSuggestions(
+    node: PNode, 
+    analysis: { needsImprovement: boolean; issues: string[]; uptimeScore: number; latencyScore: number; [key: string]: unknown }
+  ): OptimizationSuggestion[] {
     const suggestions: OptimizationSuggestion[] = [];
 
     if (analysis.issues.includes('uptime')) {
@@ -394,7 +416,7 @@ class RewardOptimizationEngine {
         type: 'performance',
         priority: 'high',
         title: 'Improve Node Uptime',
-        description: `Current uptime of ${node.metrics.uptime.toFixed(1)}% is below optimal. Implementing redundancy and monitoring can increase rewards by up to 25%.`,
+        description: `Current uptime of ${analysis.uptimeScore.toFixed(1)}% is below optimal. Implementing redundancy and monitoring can increase rewards by up to 25%.`,
         expectedImpact: {
           rewardIncrease: 25,
           costReduction: 0,
@@ -453,7 +475,10 @@ class RewardOptimizationEngine {
   /**
    * Generate location optimization suggestions
    */
-  private generateLocationSuggestions(node: PNode, analysis: { recommendation: string; [key: string]: unknown }): OptimizationSuggestion[] {
+  private generateLocationSuggestions(
+    node: PNode, 
+    analysis: { recommendation: string; density: number; [key: string]: unknown }
+  ): OptimizationSuggestion[] {
     if (analysis.recommendation === 'consider_relocation') {
       return [{
         id: `location_relocation_${node.id}`,
@@ -490,11 +515,14 @@ class RewardOptimizationEngine {
   /**
    * Generate capacity expansion suggestions
    */
-  private generateCapacitySuggestions(node: PNode, analysis: { urgency: string; [key: string]: unknown }): OptimizationSuggestion[] {
-    const urgencyMap = {
-      high: 'critical' as const,
-      medium: 'high' as const,
-      low: 'medium' as const
+  private generateCapacitySuggestions(
+    node: PNode, 
+    analysis: { expansionUrgency: string; currentUtilization: number; networkAverage: number; [key: string]: unknown }
+  ): OptimizationSuggestion[] {
+    const urgencyMap: Record<string, 'critical' | 'high' | 'medium'> = {
+      high: 'critical',
+      medium: 'high',
+      low: 'medium'
     };
 
     return [{
@@ -529,7 +557,10 @@ class RewardOptimizationEngine {
   /**
    * Generate economic optimization suggestions
    */
-  private generateEconomicSuggestions(node: PNode, analysis: { [key: string]: unknown }): OptimizationSuggestion[] {
+  private generateEconomicSuggestions(
+    node: PNode, 
+    analysis: { optimizationPotential: number; [key: string]: unknown }
+  ): OptimizationSuggestion[] {
     return [{
       id: `economic_optimization_${node.id}`,
       nodeId: node.id,

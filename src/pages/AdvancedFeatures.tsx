@@ -18,8 +18,9 @@ export default function AdvancedFeatures() {
   const [networkSLACompliance, setNetworkSLACompliance] = useState<{ 
     overallCompliance: number; 
     totalNodes: number; 
-    compliantNodes: number; 
-    violations: Array<Record<string, unknown>> 
+    compliantNodes: number;
+    warningNodes: number;
+    violatingNodes: number;
   } | null>(null);
 
   const { data: nodes = [], isLoading } = useQuery({
