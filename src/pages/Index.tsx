@@ -7,6 +7,7 @@ import { PNodeDetail } from '@/components/PNodeDetail';
 import { prpcService } from '@/services/prpc';
 import { PNode } from '@/types/pnode';
 import { useToast } from '@/hooks/use-toast';
+import { useWeb3Alerts } from '@/hooks/useWeb3Alerts';
 import GlobeVisualization from '@/components/GlobeVisualization';
 import { HistoricalCharts } from '@/components/HistoricalCharts';
 import { Leaderboard } from '@/components/Leaderboard';
@@ -18,14 +19,17 @@ const Index = () => {
   const [compareNode, setCompareNode] = useState<PNode | null>(null);
   const [isCompareOpen, setIsCompareOpen] = useState(false);
   const { toast } = useToast();
+  
+  // Initialize Web3 alerts monitoring
+  useWeb3Alerts();
 
-  const { data: nodes = [], isLoading, error, refetch } = useQuery({
+  const { data: nodes = [], isLoading, error, refetch, dataUpdatedAt } = useQuery({
     queryKey: ['pnodes'],
     queryFn: () => prpcService.getAllPNodes(),
     refetchInterval: 10000, // 10 seconds refresh
   });
 
-  const lastUpdated = new Date(); // Simplified for now, TanStack Query handles this internally
+  const lastUpdated = dataUpdatedAt ? new Date(dataUpdatedAt) : null;
 
   useEffect(() => {
     if (error) {

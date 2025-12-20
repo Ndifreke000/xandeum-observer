@@ -205,7 +205,7 @@ class PRPCService {
     /**
      * Get stats for a specific node
      */
-    async getNodeStats(ip: string): Promise<any | null> {
+    async getNodeStats(ip: string): Promise<Record<string, unknown> | null> {
         return null;
     }
 

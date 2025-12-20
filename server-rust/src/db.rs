@@ -142,6 +142,14 @@ pub async fn get_all_nodes() -> Result<Vec<NodeRecord>, sqlx::Error> {
         .await
 }
 
+pub async fn get_node_by_id(pubkey: &str) -> Result<Option<NodeRecord>, sqlx::Error> {
+    let pool = get_pool();
+    sqlx::query_as::<_, NodeRecord>("SELECT * FROM nodes WHERE pubkey = ?")
+        .bind(pubkey)
+        .fetch_optional(pool)
+        .await
+}
+
 pub async fn save_snapshot(total_nodes: u32, online_nodes: u32, total_storage: u64) -> Result<(), sqlx::Error> {
     let pool = get_pool();
     let timestamp = std::time::SystemTime::now()

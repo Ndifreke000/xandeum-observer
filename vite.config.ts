@@ -20,4 +20,17 @@ export default defineConfig(({ mode }) => ({
     'process.env': {},
     global: 'globalThis',
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
+          'chart-vendor': ['recharts'],
+          'globe-vendor': ['react-globe.gl', 'three'],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000,
+  },
 }));

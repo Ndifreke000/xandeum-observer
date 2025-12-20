@@ -18,7 +18,10 @@ interface GlobeVisualizationProps {
 }
 
 const GlobeVisualization = ({ nodes }: GlobeVisualizationProps) => {
-    const globeEl = useRef<any>();
+    const globeEl = useRef<{ 
+      pointOfView: (pov?: Record<string, unknown>) => Record<string, unknown>; 
+      controls: () => Record<string, unknown> 
+    } | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
     const [geolocatedNodes, setGeolocatedNodes] = useState<PNode[]>([]);

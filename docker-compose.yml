@@ -1,0 +1,28 @@
+services:
+  backend:
+    build:
+      context: ./server-rust
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    volumes:
+      - xandeum_data:/app
+    environment:
+      - PORT=3001
+      - DATABASE_URL=sqlite:xandeum.db
+    restart: always
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    environment:
+      - VITE_API_URL=http://localhost:3001
+    depends_on:
+      - backend
+    restart: always
+
+volumes:
+  xandeum_data:

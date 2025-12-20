@@ -43,7 +43,7 @@ export class XandeumSDK {
      * @param offset Start offset
      * @param length Number of bytes to read
      */
-    async readData(fsid: string, path: string, offset: number, length: number): Promise<any> {
+    async readData(fsid: string, path: string, offset: number, length: number): Promise<Record<string, unknown>> {
         try {
             console.log(`Preparing to peek at ${path} on FSID ${fsid}...`);
             const tx = await peek(fsid, path, offset, length, this.wallet.publicKey);
@@ -88,7 +88,7 @@ export class XandeumSDK {
     }
 
     // Helper to convert buffer result to string if needed
-    parseResultToString(result: any): string {
+    parseResultToString(result: Record<string, unknown>): string {
         if (result && result.data) {
             // Assuming result.data is a Buffer or array of bytes
             try {

@@ -16,6 +16,9 @@ import { useNodeAnalysis } from '@/hooks/useNodeAnalysis';
 import { NodeIdentity } from '@/components/NodeIdentity';
 import { StorageAnalysis } from '@/components/StorageAnalysis';
 import { NodePerformanceSignals } from '@/components/NodePerformanceSignals';
+import { SLAVerificationPanel } from '@/components/SLAVerificationPanel';
+import { Web3AlertsPanel } from '@/components/Web3AlertsPanel';
+import { RewardOptimizationPanel } from '@/components/RewardOptimizationPanel';
 import { Search, RefreshCw, Clock, ArrowLeft, Check, ChevronsUpDown, FileCode, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { prpcService } from '@/services/prpc';
@@ -235,6 +238,18 @@ export default function BlockNodeEDA() {
                                 <StorageAnalysis analysis={analysis} storage={analysis.storage} />
                             )}
                         </div>
+
+                        {/* Advanced Features Grid */}
+                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                            <SLAVerificationPanel node={nodes.find(n => n.id === searchId) || nodes[0]} />
+                            <Web3AlertsPanel />
+                        </div>
+
+                        {/* AI Optimization Panel */}
+                        <RewardOptimizationPanel 
+                            node={nodes.find(n => n.id === searchId) || nodes[0]} 
+                            networkData={nodes}
+                        />
 
                         {/* Raw Data Inspector (Honest Deep Dive) */}
                         <Card className="p-6 h-full">

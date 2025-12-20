@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -73,6 +73,21 @@ export const Header = ({
 
   const isActive = (path: string) => location.pathname === path;
 
+  const [timeLeft, setTimeLeft] = useState(10);
+
+  useEffect(() => {
+    if (!lastUpdated) return;
+
+    // Reset timer when lastUpdated changes
+    setTimeLeft(10);
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [lastUpdated]);
+
   const toggleTheme = () => {
     setIsDark(!isDark);
     // In a real app, this would toggle a class on the html element
@@ -102,6 +117,16 @@ export const Header = ({
           >
             <Activity className="w-4 h-4" />
             Node Inspector
+          </Button>
+        </Link>
+        <Link to="/advanced">
+          <Button
+            variant={isActive('/advanced') ? "secondary" : "ghost"}
+            className="w-full justify-start gap-2 text-sm h-9"
+            onClick={() => setIsOpen(false)}
+          >
+            <FileCode className="w-4 h-4" />
+            Advanced Features
           </Button>
         </Link>
       </div>
@@ -147,6 +172,12 @@ export const Header = ({
                 Node Inspector
               </Button>
             </Link>
+            <Link to="/advanced">
+              <Button variant={isActive('/advanced') ? "secondary" : "ghost"} size="sm" className="gap-2">
+                <FileCode className="w-4 h-4" />
+                Advanced
+              </Button>
+            </Link>
           </nav>
 
           <div className="w-full max-w-xs lg:max-w-sm">
@@ -172,9 +203,17 @@ export const Header = ({
           </div>
 
           {lastUpdated && (
-            <span className="hidden xl:inline-flex text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded-md border border-border/50">
-              Updated {lastUpdated.toLocaleTimeString()}
-            </span>
+            <div className="hidden xl:flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 px-3 py-1 rounded-md border border-border/50">
+              <div className="flex items-center gap-1.5">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                </span>
+                <span>Next refresh in {timeLeft}s</span>
+              </div>
+              <div className="w-px h-3 bg-border/50 mx-1" />
+              <span>Updated {lastUpdated.toLocaleTimeString()}</span>
+            </div>
           )}
 
           {onRefresh && (
@@ -223,7 +262,14 @@ export const Header = ({
                 </div>
 
                 {lastUpdated && (
-                  <div className="px-2 py-4 border-t">
+                  <div className="px-2 py-4 border-t space-y-2">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span className="relative flex h-1.5 w-1.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                      </span>
+                      Next refresh in {timeLeft}s
+                    </div>
                     <div className="text-xs text-muted-foreground">
                       Last Updated: {lastUpdated.toLocaleTimeString()}
                     </div>

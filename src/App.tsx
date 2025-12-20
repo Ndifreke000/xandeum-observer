@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import BlockNodeEDA from "./pages/BlockNodeEDA";
+import AdvancedFeatures from "./pages/AdvancedFeatures";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -19,6 +20,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/nodes/inspector" element={<BlockNodeEDA />} />
           <Route path="/nodes/eda" element={<Navigate to="/nodes/inspector" replace />} />
+          <Route path="/advanced" element={<AdvancedFeatures />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -357,40 +357,35 @@ async fn get_pods() -> impl IntoResponse {
 }
 
 async fn get_node(Path(id): Path<String>) -> impl IntoResponse {
-    // For now, just reuse get_pods logic or implement specific DB query
-    // Since we have get_all_nodes, we can filter in memory or add a get_node_by_id in db.rs
-    // For simplicity/speed, let's just fetch all and find one (not efficient but works for small scale)
-    match db::get_all_nodes().await {
-        Ok(nodes) => {
-            if let Some(n) = nodes.into_iter().find(|n| n.pubkey == id || n.ip.contains(&id) || n.pubkey.to_lowercase() == id.to_lowercase()) {
-                 let geo = if n.lat.is_some() {
-                        Some(GeoData {
-                            lat: n.lat.unwrap_or(0.0),
-                            lon: n.lon.unwrap_or(0.0),
-                            country: n.country.unwrap_or_default(),
-                            city: n.city.unwrap_or_default(),
-                        })
-                    } else {
-                        None
-                    };
+    match db::get_node_by_id(&id).await {
+        Ok(Some(n)) => {
+            let geo = if n.lat.is_some() {
+                Some(GeoData {
+                    lat: n.lat.unwrap_or(0.0),
+                    lon: n.lon.unwrap_or(0.0),
+                    country: n.country.unwrap_or_default(),
+                    city: n.city.unwrap_or_default(),
+                })
+            } else {
+                None
+            };
 
-                let dto = PodDto {
-                    pubkey: Some(n.pubkey),
-                    address: Some(n.ip),
-                    uptime: None,
-                    storage_used: n.storage_used,
-                    storage_committed: n.storage_committed,
-                    storage_usage_percent: n.storage_usage_percent,
-                    version: n.version,
-                    last_seen_timestamp: n.last_seen,
-                    is_public: None,
-                    geo,
-                    latency_ms: n.latency_ms,
-                };
-                return Json(serde_json::to_value(dto).unwrap_or_else(|e| serde_json::json!({ "error": e.to_string() })));
-            }
-            Json(serde_json::json!({ "error": "Node not found" }))
+            let dto = PodDto {
+                pubkey: Some(n.pubkey),
+                address: Some(n.ip),
+                uptime: None,
+                storage_used: n.storage_used,
+                storage_committed: n.storage_committed,
+                storage_usage_percent: n.storage_usage_percent,
+                version: n.version,
+                last_seen_timestamp: n.last_seen,
+                is_public: None,
+                geo,
+                latency_ms: n.latency_ms,
+            };
+            Json(serde_json::to_value(dto).unwrap_or_else(|e| serde_json::json!({ "error": e.to_string() })))
         },
+        Ok(None) => Json(serde_json::json!({ "error": "Node not found" })),
         Err(e) => Json(serde_json::json!({ "error": e.to_string() })),
     }
 }
