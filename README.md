@@ -1,240 +1,154 @@
-# 🌌 Xandeum Network Observer
+# Xandeum Observer
 
-**The Ultimate Analytics Platform for Xandeum pNodes - With AI-Powered Optimization, On-Chain SLA Verification & Web3 Alerts**
+**Enterprise-grade analytics and monitoring platform for Xandeum pNode operators**
 
-[![Live Demo](https://img.shields.io/badge/🚀_Live-Demo-emerald?style=for-the-badge)](https://xandeum-observer.vercel.app)
-[![Backend Status](https://img.shields.io/badge/⚡_Backend-Live-blue?style=for-the-badge)](https://xandeum-observer-ophq.onrender.com/pods)
-[![Documentation](https://img.shields.io/badge/📚_Docs-Complete-purple?style=for-the-badge)](#documentation)
-[![License](https://img.shields.io/badge/📜_License-MIT-orange?style=for-the-badge)](LICENSE)
+Xandeum Observer is a comprehensive real-time monitoring and analytics platform designed for operators of Xandeum storage provider nodes (pNodes). Built with production-quality code and modern web technologies, it provides deep insights into network health, node performance, and operational metrics.
 
-> **Built for the Xandeum Hackathon** - A production-ready analytics platform that goes beyond basic monitoring to deliver enterprise-grade features for node operators and developers.
+## Overview
 
----
+Xandeum is building a scalable storage layer for Solana dApps - a second tier of Solana accounts that can grow to exabytes and beyond. This platform helps operators monitor, optimize, and manage their pNodes effectively.
 
-## 🎯 What Makes This Special?
+## Quick Start
 
-This isn't just another node dashboard. Xandeum Observer is a **complete operational platform** for pNode operators with three groundbreaking innovations:
+### Prerequisites
 
-### 🏆 Three Unique Innovations
+- Node.js 18+ and npm
+- Rust (latest stable)
+- Git
 
-| Feature | What It Does | Why It Matters |
-|---------|-------------|----------------|
-| 🛡️ **On-Chain SLA Verification** | Verifies storage proofs on-chain with real-time compliance monitoring | Builds trust and accountability in the network |
-| 📱 **Web3 Alerts System** | XMTP wallet-to-wallet + Telegram notifications for node events | Never miss critical issues - get alerted instantly |
-| 🤖 **AI Reward Optimization** | AI-driven suggestions for maximizing node rewards and capacity planning | Maximize your earnings with data-driven insights |
+### Installation
 
----
-
-## 📸 Screenshots
-
-### 🌍 3D Global Network Visualization
-![3D Globe](https://via.placeholder.com/800x400/1a1a2e/00ff88?text=3D+Interactive+Globe+with+Real-Time+pNode+Locations)
-*Interactive 3D globe showing real-time pNode distribution across the world*
-
-### 📊 Advanced Analytics Dashboard
-![Dashboard](https://via.placeholder.com/800x400/1a1a2e/00d4ff?text=Real-Time+Network+Metrics+%26+Performance+Analytics)
-*Comprehensive network metrics with historical trends and performance indicators*
-
-### 🔍 Node Inspector with SLA Verification
-![Node Inspector](https://via.placeholder.com/800x400/1a1a2e/ff6b6b?text=Deep+Node+Analysis+with+SLA+Compliance+Tracking)
-*Detailed node analysis with on-chain storage proof verification*
-
-### 🤖 AI Reward Optimization Engine
-![AI Optimization](https://via.placeholder.com/800x400/1a1a2e/ffd93d?text=AI-Powered+Optimization+Suggestions+%26+Forecasting)
-*AI-driven suggestions for capacity planning and reward maximization*
-
-### 📱 Web3 Alerts Configuration
-![Web3 Alerts](https://via.placeholder.com/800x400/1a1a2e/a78bfa?text=Multi-Channel+Alert+System+%28XMTP+%2B+Telegram%29)
-*Configure XMTP and Telegram alerts for real-time node monitoring*
-
----
-
-## ⚡ Quick Start
-
-### 🐳 Fastest Way (Docker Compose)
 ```bash
 # Clone the repository
 git clone https://github.com/Ndifreke000/xandeum-observer.git
 cd xandeum-observer
 
-# Launch everything with one command
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+The application will be available at `http://localhost:5173`
+
+### Production Build
+
+```bash
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+### Docker Deployment
+
+```bash
+# Using Docker Compose (recommended)
 docker-compose up --build
 
-# Open your browser
 # Frontend: http://localhost:8080
 # Backend API: http://localhost:3002
 ```
 
-### 🛠️ Manual Setup
+## Core Features
 
-#### Prerequisites
-- Node.js 18+ and npm
-- Rust (latest stable)
-- Git
+### Real-Time Monitoring
+- Live pNode discovery via pRPC gossip protocol
+- Real-time metrics: uptime, latency, storage capacity, health scores
+- Network-wide statistics and performance tracking
+- Geographic distribution analysis
 
-#### 1. Start the Backend (Rust)
-```bash
-cd server-rust
-cargo run --release
-# Backend runs on http://localhost:3002
-```
+### Health Scoring System
+Composite health scoring algorithm that evaluates nodes across multiple dimensions:
+- **Uptime Performance** (30% weight)
+- **Health Metrics** (25% weight)
+- **Storage Reliability** (20% weight)
+- **Latency Performance** (15% weight)
+- **Network Contribution** (10% weight)
 
-#### 2. Start the Frontend (React)
-```bash
-cd xandeum-observer
-npm install
-npm run dev
-# Frontend runs on http://localhost:5173
-```
+Scores range from 0-100 with letter grades (A+ to F) and trend indicators.
 
-#### 3. Access the Platform
-Open your browser and navigate to:
-- **Main Dashboard**: `http://localhost:5173`
-- **Advanced Features**: `http://localhost:5173/advanced`
-- **Node Inspector**: `http://localhost:5173/nodes/inspector`
+### Advanced Filtering
+Multi-dimensional filtering system with:
+- Search by IP, ID, or location
+- Filter by status, region, version
+- Health score range filtering
+- Uptime and latency thresholds
+- Storage capacity filters
+- Quick filter presets (Top Performers, Reliable Nodes, High Capacity, etc.)
 
----
+### STOINC Earnings Calculator
+ROI calculator for pNode operators featuring:
+- Earnings projections (daily, weekly, monthly, yearly)
+- Break-even analysis
+- ROI calculations
+- Cost analysis (hardware, electricity, bandwidth, maintenance)
+- Network comparison and percentile rankings
+- Three preset configurations (Starter, Professional, Enterprise)
 
-## 🎨 Core Features
+### Node Comparison
+Side-by-side comparison of up to 2 nodes with:
+- Health score comparison
+- Performance metrics
+- Storage capacity
+- Earnings comparison
+- Overall winner determination
 
-### 📡 Real-Time Network Monitoring
-- ✅ Live pNode discovery via pRPC gossip protocol
-- ✅ Real-time metrics: uptime, latency, storage capacity
-- ✅ Historical performance tracking
-- ✅ Network-wide health statistics
+### Network Intelligence
+AI-powered analytics including:
+- Anomaly detection with severity classification
+- Reputation scoring and leaderboards
+- Predictive maintenance recommendations
+- Performance optimization suggestions
+- Network health trends and forecasting
 
-### 🌍 3D Geospatial Visualization
-- ✅ Interactive 3D globe with pNode locations
-- ✅ Network topology maps
-- ✅ Regional density analysis
-- ✅ Decentralization metrics
+### Consensus Simulator
+Interactive Byzantine Fault Tolerant consensus visualization:
+- Real-time consensus algorithm demonstration
+- Leader election (Raft-inspired)
+- Quorum-based voting (2/3 majority)
+- Automatic failure detection and recovery
+- Configurable simulation parameters
+- Educational tool for understanding distributed systems
 
-### 🔍 Advanced Node Inspector
-- ✅ Deep-dive analytics for any pNode
-- ✅ Performance history and trends
-- ✅ Health scoring system
-- ✅ Achievement badges (Uptime King, Latency Legend, etc.)
+### SLA Verification
+On-chain storage proof verification:
+- Real-time SLA compliance tracking
+- Uptime, latency, and storage reliability monitoring
+- Violation detection with severity levels
+- Historical trend analysis
+- Proof submission rate tracking
 
-### ⌨️ Command Palette (⌘K)
-- ✅ Instant search for nodes by IP, ID, or location
-- ✅ Quick navigation to any feature
-- ✅ Keyboard shortcuts for power users
+### Web3 Alerts
+Multi-channel alerting system:
+- XMTP wallet-to-wallet messaging
+- Telegram bot integration
+- Configurable alert rules
+- Alert history tracking
+- Test alert functionality
 
----
+### Data Visualization
+- Interactive 3D globe showing node locations
+- Network topology maps
+- Historical performance charts
+- 24-hour trend analysis
+- Regional distribution analytics
 
-## 🚀 Advanced Features (What Sets Us Apart)
+### User Experience
+- Dark/light mode support
+- Keyboard shortcuts (⌘K for command palette)
+- Bookmarks system
+- Export functionality (CSV, JSON, PDF)
+- Mobile-responsive design
+- Real-time data updates
 
-### 1. 🛡️ On-Chain SLA Verification
-
-**The Problem:** Node operators need verifiable proof of their service quality.
-
-**Our Solution:** Real-time on-chain verification of storage proofs with comprehensive SLA monitoring.
-
-**Features:**
-- ✅ Storage proof verification with merkle root validation
-- ✅ Real-time SLA compliance tracking (uptime, latency, storage reliability)
-- ✅ Violation detection with severity levels (minor, major, critical)
-- ✅ Network-wide compliance dashboard
-- ✅ Historical trend analysis
-
-**SLA Targets:**
-- Uptime: 99.9%
-- Latency: <200ms
-- Proof Submission Rate: 95%
-- Storage Reliability: 99.5%
-
-**How to Use:**
-1. Navigate to Node Inspector
-2. Select any pNode
-3. View "SLA Verification" panel
-4. See real-time compliance metrics and storage proofs
-
----
-
-### 2. 📱 Web3 Alerts System
-
-**The Problem:** Node operators need instant notifications when issues occur.
-
-**Our Solution:** Multi-channel alert system with Web3 messaging and Telegram integration.
-
-**Features:**
-- ✅ **XMTP Integration**: Wallet-to-wallet encrypted messaging
-- ✅ **Telegram Bot**: Instant notifications to your phone
-- ✅ **Configurable Rules**: Set custom thresholds and conditions
-- ✅ **Smart Cooldowns**: Prevent alert spam
-- ✅ **Alert History**: Track all notifications
-
-**Alert Types:**
-- 🔴 Node Offline (Critical)
-- 🟡 High Latency Warning
-- 🟠 Storage Nearly Full
-- 🔴 SLA Violation Detected
-
-**How to Use:**
-1. Go to Advanced Features → Web3 Alerts
-2. Configure Telegram (bot token + chat ID) or XMTP (wallet address)
-3. Enable/disable alert rules
-4. Get notified instantly when issues occur!
-
-**Setup Telegram:**
-```bash
-1. Message @BotFather on Telegram
-2. Create a new bot with /newbot
-3. Copy the bot token
-4. Message @userinfobot to get your chat ID
-5. Enter both in the Web3 Alerts setup
-```
-
----
-
-### 3. 🤖 AI Reward Optimization Engine
-
-**The Problem:** Node operators don't know how to maximize their rewards.
-
-**Our Solution:** AI-powered analysis that provides actionable optimization suggestions.
-
-**Features:**
-- ✅ **Smart Suggestions**: AI analyzes your node and recommends improvements
-- ✅ **Reward Forecasting**: Predict earnings for 1d, 7d, 30d, 90d
-- ✅ **Capacity Planning**: ROI calculations for storage expansion
-- ✅ **Performance Analysis**: Identify bottlenecks and optimization opportunities
-- ✅ **Market Intelligence**: Real-time network growth and competition data
-
-**Optimization Categories:**
-- ⚡ **Performance**: Uptime and latency improvements
-- 💾 **Capacity**: Storage expansion recommendations
-- 📍 **Location**: Geographic optimization
-- 💰 **Economic**: Cost-reward ratio optimization
-- 🌐 **Network**: Network contribution optimization
-
-**Example Suggestions:**
-```
-🔴 CRITICAL: Improve Node Uptime
-Current: 97.2% → Target: 99.9%
-Expected Impact: +25% rewards
-Implementation: 1-2 weeks, $500
-Steps: Set up monitoring, redundant connections, auto-restart
-
-🟡 MEDIUM: Expand Storage Capacity
-Current: 85% utilized → Recommended: +50% capacity
-Expected Impact: +35% rewards
-ROI: 180 days breakeven, 45% yearly return
-```
-
-**How to Use:**
-1. Navigate to Node Inspector
-2. Select your pNode
-3. View "AI Reward Optimization" panel
-4. Review suggestions, forecasts, and capacity plans
-5. Implement recommendations to maximize earnings!
-
----
-
-## 🏗️ Technical Architecture
+## Architecture
 
 ### Frontend Stack
 - **Framework**: React 18 with TypeScript
-- **Build Tool**: Vite (lightning-fast HMR)
+- **Build Tool**: Vite
 - **UI Library**: shadcn/ui + Radix UI
 - **Styling**: TailwindCSS
 - **3D Graphics**: Three.js + react-globe.gl
@@ -244,100 +158,236 @@ ROI: 180 days breakeven, 45% yearly return
 
 ### Backend Stack
 - **Language**: Rust
-- **Framework**: Axum (high-performance async)
-- **Runtime**: Tokio (async runtime)
+- **Framework**: Axum (async web framework)
+- **Runtime**: Tokio
 - **Database**: SQLite with SQLx
-- **API**: RESTful with JSON responses
+- **API**: RESTful JSON API
 - **Integration**: Direct pRPC protocol integration
 
-### Data Flow
-```mermaid
-graph LR
-    A[User Browser] -->|HTTP/WS| B[React Frontend]
-    B -->|REST API| C[Rust Backend]
-    C -->|pRPC| D[Xandeum Network]
-    C -->|SQL| E[SQLite DB]
-    C -->|GeoIP| F[Location Data]
-    B -->|XMTP| G[Web3 Messaging]
-    B -->|Telegram| H[Telegram API]
+### Project Structure
+
+```
+xandeum-observer/
+├── src/
+│   ├── components/          # React components
+│   │   ├── ui/             # Base UI components (shadcn/ui)
+│   │   ├── *Dashboard.tsx  # Feature dashboards
+│   │   ├── *Panel.tsx      # Feature panels
+│   │   └── *.tsx           # Other components
+│   ├── pages/              # Route pages
+│   │   ├── Index.tsx       # Main dashboard
+│   │   ├── AdvancedFeatures.tsx
+│   │   ├── Intelligence.tsx
+│   │   └── BlockNodeEDA.tsx
+│   ├── services/           # Business logic
+│   │   ├── prpc.ts         # pRPC integration
+│   │   ├── health-score.ts # Health scoring
+│   │   ├── earnings-calculator.ts
+│   │   └── *.ts            # Other services
+│   ├── hooks/              # Custom React hooks
+│   ├── utils/              # Utility functions
+│   └── types/              # TypeScript types
+├── server-rust/            # Rust backend
+│   ├── src/
+│   │   ├── main.rs
+│   │   └── *.rs
+│   └── Cargo.toml
+├── public/                 # Static assets
+└── dist/                   # Production build
 ```
 
-### Performance Metrics
-- ⚡ Initial Load: <2s
-- ⚡ API Response: <100ms
-- ⚡ Real-time Updates: 5s interval
-- ⚡ Build Size: 512KB (gzipped)
-- ⚡ Lighthouse Score: 95+
+## API Integration
 
----
+### pRPC Endpoints
 
-## 📚 Documentation
+The platform integrates with Xandeum's pRPC protocol:
 
-Comprehensive documentation is included:
+```typescript
+// Get all pNodes
+GET /pods
 
-| Document | Description |
-|----------|-------------|
-| [ADVANCED_FEATURES_IMPLEMENTATION.md](ADVANCED_FEATURES_IMPLEMENTATION.md) | Technical details of all advanced features |
-| [ADVANCED_FEATURES_QUICKSTART.md](ADVANCED_FEATURES_QUICKSTART.md) | User guide for SLA, Alerts, and AI Optimization |
-| [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) | Production deployment instructions |
-| [PRODUCTION_READINESS.md](PRODUCTION_READINESS.md) | Production checklist and best practices |
+// Get specific pNode
+GET /pod/{id}
 
----
-
-## 🎯 Judging Criteria Alignment
-
-### ✅ Functionality
-- **Requirement**: Successfully retrieve and display pNode information using valid pRPC calls
-- **Our Implementation**: ✅ Full pRPC integration with real-time data fetching, historical tracking, and advanced analytics
-
-### ✅ Clarity
-- **Requirement**: Information should be easy to understand
-- **Our Implementation**: ✅ Clean UI, intuitive navigation, visual data representations, comprehensive tooltips
-
-### ✅ User Experience
-- **Requirement**: Intuitive and user-friendly platform
-- **Our Implementation**: ✅ Modern design, responsive layout, command palette, keyboard shortcuts, mobile-friendly
-
-### ✅ Innovation (Bonus)
-- **Requirement**: Additional features or unique ways to present data
-- **Our Implementation**: ✅✅✅ THREE major innovations:
-  1. On-Chain SLA Verification
-  2. Web3 Alerts System
-  3. AI Reward Optimization Engine
-
----
-
-## 🚀 Deployment
-
-### Production Build
-```bash
-# Build frontend
-npm run build
-
-# Build backend
-cd server-rust
-cargo build --release
-
-# Deploy to your preferred platform
-# Frontend: Vercel, Netlify, Cloudflare Pages
-# Backend: Render, Railway, Fly.io
+// Response format
+{
+  id: string,
+  address: string,
+  status: 'online' | 'unstable' | 'offline',
+  health: { total: number },
+  storage: { used: number, committed: number },
+  metrics: { uptime: number, latency: number },
+  geo: { country: string, city: string },
+  version: string,
+  credits: number
+}
 ```
+
+### Backend API
+
+Rust backend provides additional endpoints:
+
+```
+GET  /pods              # List all pNodes
+GET  /pod/:id           # Get pNode details
+GET  /network/stats     # Network statistics
+GET  /health            # Health check
+```
+
+## Configuration
 
 ### Environment Variables
+
+Create a `.env` file in the root directory:
+
 ```bash
-# Frontend (.env)
-VITE_API_URL=https://your-backend-url.com
+# Frontend
+VITE_API_URL=http://localhost:3002
 
 # Backend (server-rust/.env)
 DATABASE_URL=sqlite:xandeum.db
 PORT=3002
+
+# Optional: Telegram Bot
+TELEGRAM_BOT_TOKEN=your_bot_token
+TELEGRAM_CHAT_ID=your_chat_id
 ```
 
----
+### Telegram Bot Setup
 
-## 🤝 Contributing
+1. Message @BotFather on Telegram
+2. Create a new bot with `/newbot`
+3. Copy the bot token
+4. Message @userinfobot to get your chat ID
+5. Add both to `.env` file
 
-We welcome contributions! Here's how:
+## Usage Guide
+
+### Main Dashboard
+
+The main dashboard provides an overview of the entire network:
+
+1. **Network Statistics**: Key metrics at a glance
+2. **Network Insights**: Predictive analytics and trends
+3. **24h Trends**: Historical performance charts
+4. **Earnings Calculator**: ROI projections
+5. **Leaderboard**: Top performing nodes
+6. **3D Globe**: Geographic visualization
+7. **Node Registry**: Filterable list of all pNodes
+
+### Advanced Filtering
+
+Access advanced filters via the "Advanced Filters" button:
+
+1. Select quick presets or customize filters
+2. Adjust health score, uptime, latency ranges
+3. Filter by region, status, or version
+4. Sort by any metric
+5. Results update in real-time
+
+### Node Comparison
+
+Compare nodes to make informed decisions:
+
+1. Click on a node to view details
+2. Click "Compare" on another node
+3. View side-by-side metrics
+4. See overall winner determination
+
+### Earnings Calculator
+
+Calculate potential earnings:
+
+1. Navigate to the calculator section
+2. Choose a preset or customize configuration
+3. Input your costs
+4. View earnings projections and ROI
+5. Compare against network averages
+
+### Intelligence Features
+
+Access AI-powered features via the Intelligence page:
+
+1. **Anomaly Detection**: Identify unusual behavior
+2. **Reputation System**: Node reliability rankings
+3. **Predictive Maintenance**: Proactive recommendations
+
+### Advanced Features
+
+Explore advanced capabilities:
+
+1. **Consensus Simulator**: Learn about distributed consensus
+2. **SLA Verification**: Verify storage proofs
+3. **Web3 Alerts**: Configure notifications
+4. **AI Optimization**: Get performance recommendations
+
+## Performance
+
+- **Initial Load**: <2 seconds
+- **API Response**: <100ms average
+- **Real-time Updates**: 30-second polling interval
+- **Build Size**: ~3MB (gzipped)
+- **Mobile Optimized**: Fully responsive
+
+## Browser Support
+
+- Chrome/Edge 90+
+- Firefox 88+
+- Safari 14+
+- Mobile browsers (iOS Safari, Chrome Mobile)
+
+## Development
+
+### Available Scripts
+
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run preview      # Preview production build
+npm run lint         # Run ESLint
+npm run type-check   # Run TypeScript compiler
+```
+
+### Code Quality
+
+- **TypeScript**: 100% type-safe
+- **ESLint**: Configured with recommended rules
+- **Zero Errors**: Production build has zero TypeScript errors
+- **Testing**: Component and integration tests
+
+## Deployment
+
+### Vercel (Recommended for Frontend)
+
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Deploy
+vercel --prod
+```
+
+### Render (Recommended for Backend)
+
+1. Connect your GitHub repository
+2. Select `server-rust` directory
+3. Build command: `cargo build --release`
+4. Start command: `./target/release/server`
+
+### Docker
+
+```bash
+# Build and run with Docker Compose
+docker-compose up -d
+
+# Or build manually
+docker build -t xandeum-observer .
+docker run -p 8080:80 xandeum-observer
+```
+
+## Contributing
+
+Contributions are welcome! Please follow these guidelines:
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -345,83 +395,22 @@ We welcome contributions! Here's how:
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
----
-
-## 📊 Project Stats
-
-- **Lines of Code**: 15,000+
-- **Components**: 50+
-- **API Endpoints**: 20+
-- **Test Coverage**: 85%+
-- **TypeScript**: 100% type-safe
-- **Build Status**: ✅ Passing
-- **Production Ready**: ✅ Yes
-
----
-
-## 🏆 Why This Project Wins
-
-### Beyond Basic Requirements
-Most submissions will show:
-- ✅ List of pNodes
-- ✅ Basic metrics
-- ✅ Simple charts
-
-**We deliver:**
-- ✅ Everything above PLUS
-- ✅ 3D interactive globe
-- ✅ On-chain SLA verification
-- ✅ Web3 messaging alerts
-- ✅ AI optimization engine
-- ✅ Enterprise-grade features
-- ✅ Production-ready code
-
-### Real-World Value
-Our three innovations solve **real problems**:
-1. **SLA Verification** → Builds trust and accountability
-2. **Web3 Alerts** → Operational efficiency and uptime
-3. **AI Optimization** → Revenue maximization
-
-### Production Quality
-- Zero TypeScript errors
-- Comprehensive error handling
-- Full documentation
-- Mobile responsive
-- Fast performance
-- Professional UX/UI
-
----
-
-## 📞 Support & Contact
-
-- **Live Demo**: [xandeum-observer.vercel.app](https://xandeum-observer.vercel.app)
-- **GitHub**: [github.com/Ndifreke000/xandeum-observer](https://github.com/Ndifreke000/xandeum-observer)
-- **Discord**: Join [Xandeum Discord](https://discord.gg/uqRSmmM5m)
-- **Issues**: [GitHub Issues](https://github.com/Ndifreke000/xandeum-observer/issues)
-
----
-
-## 📜 License
+## License
 
 MIT License - see [LICENSE](LICENSE) file for details
 
+## Support
+
+- **Documentation**: See [FEATURES.md](FEATURES.md) for detailed feature documentation
+- **Issues**: [GitHub Issues](https://github.com/Ndifreke000/xandeum-observer/issues)
+- **Discord**: [Xandeum Discord](https://discord.gg/uqRSmmM5m)
+
+## Acknowledgments
+
+Built for the Xandeum ecosystem with modern web technologies and production-grade architecture.
+
 ---
 
-## 🙏 Acknowledgments
-
-- **Xandeum Labs** for building the future of decentralized storage
-- **Solana Foundation** for the incredible ecosystem
-- **Superteam** for organizing the hackathon
-- **Open Source Community** for the amazing tools and libraries
-
----
-
-<div align="center">
-
-**Built with ❤️ for the Xandeum Hackathon**
-
-⭐ Star this repo if you find it useful!
-
-[Live Demo](https://xandeum-observer.vercel.app) • [Documentation](ADVANCED_FEATURES_IMPLEMENTATION.md) • [Report Bug](https://github.com/Ndifreke000/xandeum-observer/issues)
-
-</div>
+**Status**: Production Ready  
+**Version**: 1.0.0  
+**Last Updated**: December 2024
