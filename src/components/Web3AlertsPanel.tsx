@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useToast } from '@/hooks/use-toast';
 import { 
   Bell, 
   MessageSquare, 
@@ -17,11 +18,13 @@ import {
   AlertTriangle, 
   Clock,
   Zap,
-  Wallet
+  Wallet,
+  TestTube
 } from 'lucide-react';
 import { web3AlertsService, AlertRule, AlertNotification } from '@/services/web3-alerts';
 
 export function Web3AlertsPanel() {
+  const { toast } = useToast();
   const [alertRules, setAlertRules] = useState<AlertRule[]>([]);
   const [alertHistory, setAlertHistory] = useState<AlertNotification[]>([]);
   const [xmtpAddress, setXmtpAddress] = useState('');
@@ -43,10 +46,12 @@ export function Web3AlertsPanel() {
     if (!xmtpAddress) return;
     
     try {
-      // For demo purposes, we'll simulate the connection
-      // In production, this would require wallet connection
       web3AlertsService.subscribeXMTPAddress(xmtpAddress);
       setIsXMTPConnected(true);
+      toast({
+        title: "✅ XMTP Connected",
+        description: `Subscribed ${xmtpAddress.substring(0, 10)}... to alerts`,
+      });
     } catch (error) {
       console.error('Failed to connect XMTP:', error);
     }
@@ -57,6 +62,83 @@ export function Web3AlertsPanel() {
     
     web3AlertsService.configureTelegram(telegramBotToken, [telegramChatId]);
     setIsTelegramConnected(true);
+    toast({
+      title: "✅ Telegram Connected",
+      description: "Bot configured successfully",
+    });
+  };
+
+  const sendTestAlert = async () => {
+    toast({
+      title: "🚨 Sending Test Alert...",
+      description: "Check your Telegram in a few seconds",
+    });
+
+    // Create a demo alert
+    const testAlert: AlertNotification = {
+      id: `test_${Date.now()}`,
+      ruleId: 'test',
+      nodeId: '173.212.207.32:9001',
+      type: 'node_down',
+      severity: 'critical',
+      title: '🔴 TEST ALERT: Node Offline',
+      message: 'This is a test alert from Xandeum Observer.\n\nNode 173.212.207.32:9001 has gone offline.\n\nThis demonstrates real-time monitoring capabilities.',
+      timestamp: new Date().toISOString(),
+      channels: isTelegramConnected ? ['telegram'] : ['demo'],
+      delivered: false,
+      metadata: {
+        nodeIp: '173.212.207.32:9001',
+        nodeStatus: 'offline',
+        isTest: true
+      }
+    };
+
+    // If Telegram is configured, try to send real alert
+    if (isTelegramConnected && telegramBotToken && telegramChatId) {
+      try {
+        const emoji = '🔴';
+        const message = `${emoji} *TEST ALERT: Node Offline*\n\nThis is a test alert from Xandeum Observer.\n\nNode: 173.212.207.32:9001\nStatus: OFFLINE\n\n⏰ ${new Date().toLocaleString()}\n\n✅ Your alerts are working!`;
+        
+        const url = `https://api.telegram.org/bot${telegramBotToken}/sendMessage`;
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: telegramChatId,
+            text: message,
+            parse_mode: 'Markdown'
+          })
+        });
+
+        if (response.ok) {
+          testAlert.delivered = true;
+          toast({
+            title: "✅ Test Alert Sent!",
+            description: "Check your Telegram - alert delivered successfully",
+          });
+        } else {
+          throw new Error('Failed to send');
+        }
+      } catch (error) {
+        console.error('Failed to send test alert:', error);
+        toast({
+          title: "⚠️ Alert Simulated",
+          description: "Check your bot token and chat ID. Alert added to history for demo.",
+          variant: "destructive"
+        });
+      }
+    } else {
+      // Demo mode - just show in UI
+      testAlert.delivered = true;
+      toast({
+        title: "✅ Demo Alert Created",
+        description: "Configure Telegram to send real alerts. Alert added to history.",
+      });
+    }
+
+    // Add to history
+    alertHistory.unshift(testAlert);
+    setAlertHistory([...alertHistory]);
   };
 
   const toggleAlertRule = (ruleId: string, enabled: boolean) => {
@@ -86,10 +168,21 @@ export function Web3AlertsPanel() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Bell className="h-5 w-5" />
-          Web3 Alerts
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <Bell className="h-5 w-5" />
+            Web3 Alerts
+          </CardTitle>
+          <Button 
+            onClick={sendTestAlert}
+            size="sm"
+            variant="outline"
+            className="gap-2"
+          >
+            <TestTube className="h-4 w-4" />
+            Send Test Alert
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="setup" className="w-full">

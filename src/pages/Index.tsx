@@ -2,16 +2,21 @@ import { useState, useCallback, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Header } from '@/components/Header';
 import { NetworkStats } from '@/components/NetworkStats';
+import { NetworkInsights } from '@/components/NetworkInsights';
+import { NetworkTrendChart } from '@/components/NetworkTrendChart';
 import { PNodeGrid } from '@/components/PNodeGrid';
 import { PNodeDetail } from '@/components/PNodeDetail';
 import { prpcService } from '@/services/prpc';
 import { PNode } from '@/types/pnode';
 import { useToast } from '@/hooks/use-toast';
 import { useWeb3Alerts } from '@/hooks/useWeb3Alerts';
+import { useNodeFilters } from '@/hooks/useNodeFilters';
 import GlobeVisualization from '@/components/GlobeVisualization';
 import { HistoricalCharts } from '@/components/HistoricalCharts';
 import { Leaderboard } from '@/components/Leaderboard';
 import { ComparisonModal } from '@/components/ComparisonModal';
+import { NodeFilterPanel } from '@/components/NodeFilterPanel';
+import { EarningsCalculator } from '@/components/EarningsCalculator';
 
 const Index = () => {
   const [selectedNode, setSelectedNode] = useState<PNode | null>(null);
@@ -31,6 +36,19 @@ const Index = () => {
     retry: 3, // Retry failed requests 3 times
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
   });
+
+  // Initialize filter system
+  const {
+    filters,
+    filteredNodes,
+    filterOptions,
+    updateFilter,
+    applyPreset,
+    resetFilters,
+    hasActiveFilters,
+    activePreset,
+    presets
+  } = useNodeFilters(nodes);
 
   const lastUpdated = dataUpdatedAt ? new Date(dataUpdatedAt) : null;
 
@@ -82,6 +100,12 @@ const Index = () => {
         <div className={`flex-1 p-3 md:p-6 space-y-4 md:space-y-6 transition-all ${selectedNode ? 'lg:mr-[480px]' : ''}`}>
           <NetworkStats nodes={nodes} />
 
+          <NetworkInsights nodes={nodes} />
+
+          <NetworkTrendChart nodes={nodes} />
+
+          <EarningsCalculator nodes={nodes} />
+
           <HistoricalCharts nodes={nodes} />
 
           <Leaderboard nodes={nodes} onSelectNode={handleSelectNode} />
@@ -91,13 +115,30 @@ const Index = () => {
           </div>
 
           <div className="border-t-2 border-border/60 pt-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-medium">pNode Registry</h2>
-              <span className="text-sm text-muted-foreground">{nodes.length} Nodes Discovered</span>
+            <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+              <div>
+                <h2 className="text-lg font-medium">pNode Registry</h2>
+                <span className="text-sm text-muted-foreground">
+                  {filteredNodes.length} of {nodes.length} Nodes
+                  {hasActiveFilters && ' (filtered)'}
+                </span>
+              </div>
+              <NodeFilterPanel
+                filters={filters}
+                filterOptions={filterOptions}
+                onUpdateFilter={updateFilter}
+                onApplyPreset={applyPreset}
+                onReset={resetFilters}
+                hasActiveFilters={hasActiveFilters}
+                activePreset={activePreset}
+                presets={presets}
+                resultCount={filteredNodes.length}
+                totalCount={nodes.length}
+              />
             </div>
 
             <PNodeGrid
-              nodes={nodes}
+              nodes={filteredNodes}
               onSelectNode={handleSelectNode}
               onCompareNode={handleCompareNode}
               selectedNodeId={selectedNode?.id}

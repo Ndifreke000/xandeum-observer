@@ -14,6 +14,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { HealthScoreBadge } from '@/components/HealthScoreBadge';
+import { calculateHealthScore } from '@/services/health-score';
 
 interface PNodeGridProps {
     nodes: PNode[];
@@ -181,10 +183,7 @@ export function PNodeGrid({ nodes, onSelectNode, onCompareNode, selectedNodeId }
                             {/* Footer: Health & Last Seen */}
                             <div className="flex justify-between items-center text-xs">
                                 <div className="flex items-center gap-2">
-                                    <div className="flex flex-col">
-                                        <span className="text-[10px] text-muted-foreground">Health Score</span>
-                                        <span className={`font-bold ${getHealthColor(node.health.total)}`}>{node.health.total}/100</span>
-                                    </div>
+                                    <HealthScoreBadge score={calculateHealthScore(node)} size="sm" />
                                 </div>
                                 <div className="flex flex-col items-end gap-2">
                                     <span className="text-[10px] text-muted-foreground">Last Seen</span>

@@ -7,7 +7,8 @@ import {
     DialogDescription,
 } from "@/components/ui/dialog";
 import { Badge } from '@/components/ui/badge';
-import { Trophy, Activity, Database, Zap, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { Trophy, Activity, Database, Zap, ShieldCheck, CheckCircle2, Award } from 'lucide-react';
+import { calculateHealthScore, getScoreColor } from '@/services/health-score';
 
 interface ComparisonModalProps {
     nodeA: PNode;
@@ -18,6 +19,10 @@ interface ComparisonModalProps {
 
 export function ComparisonModal({ nodeA, nodeB, isOpen, onClose }: ComparisonModalProps) {
     if (!nodeB) return null;
+
+    // Calculate health scores
+    const scoreA = calculateHealthScore(nodeA);
+    const scoreB = calculateHealthScore(nodeB);
 
     const compareMetric = (valA: number, valB: number, higherIsBetter = true) => {
         if (valA === valB) return 'neutral';
@@ -33,11 +38,17 @@ export function ComparisonModal({ nodeA, nodeB, isOpen, onClose }: ComparisonMod
         return winner === current ? 'text-emerald-500 font-bold' : 'text-muted-foreground/60';
     };
 
+    const healthScoreWinner = compareMetric(scoreA.overall, scoreB.overall);
     const healthWinner = compareMetric(nodeA.health.total, nodeB.health.total);
     const uptimeWinner = compareMetric(nodeA.metrics.uptime, nodeB.metrics.uptime);
     const latencyWinner = compareMetric(nodeA.metrics.latency, nodeB.metrics.latency, false);
     const storageWinner = compareMetric(nodeA.storage.committed, nodeB.storage.committed);
     const rewardsWinner = compareMetric(nodeA.credits || 0, nodeB.credits || 0);
+
+    // Count wins
+    const winsA = [healthScoreWinner, healthWinner, uptimeWinner, latencyWinner, storageWinner, rewardsWinner].filter(w => w === 'A').length;
+    const winsB = [healthScoreWinner, healthWinner, uptimeWinner, latencyWinner, storageWinner, rewardsWinner].filter(w => w === 'B').length;
+    const overallWinner = winsA > winsB ? 'A' : winsB > winsA ? 'B' : 'neutral';
 
     const WinnerBadge = ({ winner, current }: { winner: string, current: 'A' | 'B' }) => {
         if (winner === current) {
@@ -60,6 +71,12 @@ export function ComparisonModal({ nodeA, nodeB, isOpen, onClose }: ComparisonMod
                     <DialogTitle className="text-2xl font-black tracking-tighter flex items-center gap-2">
                         <Activity className="h-6 w-6 text-blue-500" />
                         NODE BENCHMARKING
+                        {overallWinner !== 'neutral' && (
+                            <Badge className="ml-auto gap-1 bg-emerald-500">
+                                <Award className="h-3 w-3" />
+                                Node {overallWinner} Wins ({overallWinner === 'A' ? winsA : winsB}/6)
+                            </Badge>
+                        )}
                     </DialogTitle>
                     <DialogDescription className="font-medium">
                         Side-by-side performance comparison of two pNodes on the Xandeum network
@@ -70,7 +87,10 @@ export function ComparisonModal({ nodeA, nodeB, isOpen, onClose }: ComparisonMod
                     {/* Labels Column */}
                     <div className="flex flex-col justify-center space-y-10 pt-16">
                         <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground h-12">
-                            <ShieldCheck className="h-4 w-4" /> Health Score
+                            <Award className="h-4 w-4" /> Health Score
+                        </div>
+                        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground h-12">
+                            <ShieldCheck className="h-4 w-4" /> Health
                         </div>
                         <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground h-12">
                             <Activity className="h-4 w-4" /> Uptime
@@ -87,11 +107,19 @@ export function ComparisonModal({ nodeA, nodeB, isOpen, onClose }: ComparisonMod
                     </div>
 
                     {/* Node A Column */}
-                    <div className={`rounded-3xl p-6 border transition-all duration-500 ${healthWinner === 'A' ? 'bg-emerald-500/5 border-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.05)]' : 'bg-secondary/20 border-border/50'} text-center space-y-10`}>
+                    <div className={`rounded-3xl p-6 border transition-all duration-500 ${overallWinner === 'A' ? 'bg-emerald-500/5 border-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.05)]' : 'bg-secondary/20 border-border/50'} text-center space-y-10`}>
                         <div className="mb-4">
                             <Badge variant="outline" className="mb-2 bg-background/50">NODE A</Badge>
                             <div className="font-mono text-[10px] truncate text-muted-foreground opacity-60">{nodeA.id}</div>
                             <div className="font-black text-xl mt-1 tracking-tight">{nodeA.ip}</div>
+                        </div>
+
+                        <div className="space-y-1 flex flex-col items-center">
+                            <div className={`text-3xl font-black h-12 flex items-center justify-center gap-2 ${winnerColor(healthScoreWinner, 'A')}`}>
+                                <span className={getScoreColor(scoreA.overall)}>{scoreA.overall}</span>
+                                <span className="text-sm">{scoreA.grade}</span>
+                            </div>
+                            <WinnerBadge winner={healthScoreWinner} current="A" />
                         </div>
 
                         <div className="space-y-1 flex flex-col items-center">
@@ -131,11 +159,19 @@ export function ComparisonModal({ nodeA, nodeB, isOpen, onClose }: ComparisonMod
                     </div>
 
                     {/* Node B Column */}
-                    <div className={`rounded-3xl p-6 border transition-all duration-500 ${healthWinner === 'B' ? 'bg-emerald-500/5 border-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.05)]' : 'bg-secondary/20 border-border/50'} text-center space-y-10`}>
+                    <div className={`rounded-3xl p-6 border transition-all duration-500 ${overallWinner === 'B' ? 'bg-emerald-500/5 border-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.05)]' : 'bg-secondary/20 border-border/50'} text-center space-y-10`}>
                         <div className="mb-4">
                             <Badge variant="outline" className="mb-2 bg-background/50">NODE B</Badge>
                             <div className="font-mono text-[10px] truncate text-muted-foreground opacity-60">{nodeB.id}</div>
                             <div className="font-black text-xl mt-1 tracking-tight">{nodeB.ip}</div>
+                        </div>
+
+                        <div className="space-y-1 flex flex-col items-center">
+                            <div className={`text-3xl font-black h-12 flex items-center justify-center gap-2 ${winnerColor(healthScoreWinner, 'B')}`}>
+                                <span className={getScoreColor(scoreB.overall)}>{scoreB.overall}</span>
+                                <span className="text-sm">{scoreB.grade}</span>
+                            </div>
+                            <WinnerBadge winner={healthScoreWinner} current="B" />
                         </div>
 
                         <div className="space-y-1 flex flex-col items-center">
@@ -179,7 +215,8 @@ export function ComparisonModal({ nodeA, nodeB, isOpen, onClose }: ComparisonMod
                     <div className="absolute top-0 left-0 w-1 h-full bg-blue-500" />
                     <p className="text-sm text-muted-foreground leading-relaxed">
                         <span className="font-black text-blue-500 uppercase tracking-tighter mr-2">Benchmarking Analysis:</span>
-                        {healthWinner === 'A' ? 'Node A' : healthWinner === 'B' ? 'Node B' : 'Both nodes'} demonstrate superior overall stability.
+                        {overallWinner === 'A' ? 'Node A' : overallWinner === 'B' ? 'Node B' : 'Both nodes'} demonstrate{overallWinner === 'neutral' ? '' : 's'} superior overall performance with {overallWinner === 'A' ? winsA : overallWinner === 'B' ? winsB : 'equal'} category wins.
+                        {' '}Health Score: Node {healthScoreWinner === 'A' ? 'A' : 'B'} ({healthScoreWinner === 'A' ? scoreA.overall : scoreB.overall}/100, Grade {healthScoreWinner === 'A' ? scoreA.grade : scoreB.grade}).
                         {storageWinner === 'A' ? ' Node A' : storageWinner === 'B' ? ' Node B' : ' Both'} provide significant storage commitment, which is critical for Xandeum's exabyte-scale mission.
                         {latencyWinner === 'A' ? ' Node A' : latencyWinner === 'B' ? ' Node B' : ' Both'} offer ultra-low latency, ensuring high-performance dApp interactions.
                     </p>
