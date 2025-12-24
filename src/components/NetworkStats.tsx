@@ -49,23 +49,12 @@ export const NetworkStats = ({ nodes }: NetworkStatsProps) => {
 
   const stats = [
     {
-      label: 'Total Storage',
-      value: formatBytes(totalStorageBytes),
-      icon: HardDrive,
-      color: 'text-blue-500',
-      subtext: 'Network Usage',
-      bg: 'bg-blue-500/10',
-    },
-    {
-      label: 'Storage Heat',
-      value: formatBytes(totalCommittedBytes),
-      icon: Database,
-      color: 'text-cyan-500',
-      subtext: 'Total Capacity',
-      bg: 'bg-cyan-500/10',
-      badge: saturation > 80 ? 'HIGH' : 'OPTIMAL',
-      badgeColor: saturation > 80 ? 'text-rose-500 bg-rose-500/10 border-rose-500/20' : 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20',
-      extraSubtext: `${saturation.toFixed(2)}% Saturation`
+      label: 'Active Nodes',
+      value: activeNodes,
+      icon: Server,
+      color: 'text-orange-500',
+      subtext: `${nodes.length} Total Discovered`,
+      bg: 'bg-orange-500/10',
     },
     {
       label: 'Network Stability',
@@ -76,20 +65,30 @@ export const NetworkStats = ({ nodes }: NetworkStatsProps) => {
       bg: 'bg-green-500/10',
     },
     {
+      label: 'Storage Capacity',
+      value: formatBytes(totalCommittedBytes),
+      icon: Database,
+      color: 'text-cyan-500',
+      subtext: `${saturation.toFixed(1)}% Used`,
+      bg: 'bg-cyan-500/10',
+      badge: saturation > 80 ? 'HIGH' : 'OPTIMAL',
+      badgeColor: saturation > 80 ? 'text-rose-500 bg-rose-500/10 border-rose-500/20' : 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20',
+    },
+    {
+      label: 'Storage Used',
+      value: formatBytes(totalStorageBytes),
+      icon: HardDrive,
+      color: 'text-blue-500',
+      subtext: 'Network Usage',
+      bg: 'bg-blue-500/10',
+    },
+    {
       label: 'Consensus Ver',
       value: consensusVersion.split('-')[0], // Show only base version
       icon: GitBranch,
       color: 'text-purple-500',
       subtext: 'Majority Version',
       bg: 'bg-purple-500/10',
-    },
-    {
-      label: 'Active Nodes',
-      value: activeNodes,
-      icon: Server,
-      color: 'text-orange-500',
-      subtext: `${nodes.length} Total Discovered`,
-      bg: 'bg-orange-500/10',
     },
   ];
 
@@ -120,9 +119,7 @@ export const NetworkStats = ({ nodes }: NetworkStatsProps) => {
             </div>
             <div>
               <div className="text-3xl font-bold tracking-tight">{stat.value}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {stat.subtext} {stat.extraSubtext && <span>• <span className="text-primary/80">{stat.extraSubtext}</span></span>}
-              </p>
+              <p className="text-xs text-muted-foreground mt-1">{stat.subtext}</p>
             </div>
           </CardContent>
         </Card>

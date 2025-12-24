@@ -11,7 +11,6 @@ import { useWeb3Alerts } from '@/hooks/useWeb3Alerts';
 import GlobeVisualization from '@/components/GlobeVisualization';
 import { HistoricalCharts } from '@/components/HistoricalCharts';
 import { Leaderboard } from '@/components/Leaderboard';
-import { GossipFeed } from '@/components/GossipFeed';
 import { ComparisonModal } from '@/components/ComparisonModal';
 
 const Index = () => {
@@ -26,7 +25,11 @@ const Index = () => {
   const { data: nodes = [], isLoading, error, refetch, dataUpdatedAt } = useQuery({
     queryKey: ['pnodes'],
     queryFn: () => prpcService.getAllPNodes(),
-    refetchInterval: 10000, // 10 seconds refresh
+    refetchInterval: 30000, // Optimized: 30 seconds instead of 10
+    staleTime: 20000, // Consider data fresh for 20 seconds
+    gcTime: 300000, // Keep in cache for 5 minutes (renamed from cacheTime)
+    retry: 3, // Retry failed requests 3 times
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
   });
 
   const lastUpdated = dataUpdatedAt ? new Date(dataUpdatedAt) : null;
@@ -76,16 +79,14 @@ const Index = () => {
       />
 
       <main className="flex-1 flex relative">
-        <div className={`flex-1 p-6 space-y-6 transition-all ${selectedNode ? 'lg:mr-[480px]' : ''}`}>
-          <div className="mb-6">
-            <NetworkStats nodes={nodes} />
-          </div>
+        <div className={`flex-1 p-3 md:p-6 space-y-4 md:space-y-6 transition-all ${selectedNode ? 'lg:mr-[480px]' : ''}`}>
+          <NetworkStats nodes={nodes} />
 
           <HistoricalCharts nodes={nodes} />
 
           <Leaderboard nodes={nodes} onSelectNode={handleSelectNode} />
 
-          <div className="mb-6">
+          <div className="mb-4 md:mb-6">
             <GlobeVisualization nodes={nodes} />
           </div>
 

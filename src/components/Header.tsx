@@ -135,18 +135,18 @@ export const Header = ({
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 shadow-sm">
-      <div className="w-full flex h-16 items-center justify-between px-6">
+      <div className="w-full flex h-14 md:h-16 items-center justify-between px-3 md:px-6">
         {/* Left: Logo & Health */}
-        <div className="flex items-center gap-6">
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="relative flex h-8 w-8 items-center justify-center">
-              <img src="/logo.png" alt="Xandeum Logo" className="h-8 w-8 object-contain" />
+        <div className="flex items-center gap-2 md:gap-6">
+          <Link to="/" className="flex items-center gap-1.5 md:gap-2 group">
+            <div className="relative flex h-7 w-7 md:h-8 md:w-8 items-center justify-center">
+              <img src="/logo.png" alt="Xandeum Logo" className="h-7 w-7 md:h-8 md:w-8 object-contain" />
             </div>
             <div className="flex flex-col">
-              <span className="text-lg font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
+              <span className="text-base md:text-lg font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
                 Xandeum
               </span>
-              <span className="text-[10px] font-medium text-muted-foreground leading-none">
+              <span className="text-[9px] md:text-[10px] font-medium text-muted-foreground leading-none">
                 Network Observer
               </span>
             </div>
@@ -157,25 +157,25 @@ export const Header = ({
           </div>
         </div>
 
-        {/* Center: Navigation & Search */}
-        <div className="hidden md:flex flex-1 items-center justify-center gap-6 px-4">
+        {/* Center: Navigation & Search - Hidden on mobile */}
+        <div className="hidden md:flex flex-1 items-center justify-center gap-4 lg:gap-6 px-4">
           <nav className="flex items-center gap-1">
             <Link to="/">
-              <Button variant={isActive('/') ? "secondary" : "ghost"} size="sm" className="gap-2">
-                <Network className="w-4 h-4" />
-                pNodes
+              <Button variant={isActive('/') ? "secondary" : "ghost"} size="sm" className="gap-2 h-8 md:h-9 text-xs md:text-sm">
+                <Network className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                <span className="hidden lg:inline">pNodes</span>
               </Button>
             </Link>
             <Link to="/nodes/inspector">
-              <Button variant={location.pathname.startsWith('/nodes') ? "secondary" : "ghost"} size="sm" className="gap-2">
-                <Activity className="w-4 h-4" />
-                Node Inspector
+              <Button variant={location.pathname.startsWith('/nodes') ? "secondary" : "ghost"} size="sm" className="gap-2 h-8 md:h-9 text-xs md:text-sm">
+                <Activity className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                <span className="hidden lg:inline">Inspector</span>
               </Button>
             </Link>
             <Link to="/advanced">
-              <Button variant={isActive('/advanced') ? "secondary" : "ghost"} size="sm" className="gap-2">
-                <FileCode className="w-4 h-4" />
-                Advanced
+              <Button variant={isActive('/advanced') ? "secondary" : "ghost"} size="sm" className="gap-2 h-8 md:h-9 text-xs md:text-sm">
+                <FileCode className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                <span className="hidden lg:inline">Advanced</span>
               </Button>
             </Link>
           </nav>
@@ -185,19 +185,20 @@ export const Header = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* Right: Actions */}
+        <div className="flex items-center gap-1 md:gap-2">
           <div className="hidden md:flex items-center gap-1 mr-2">
-            <Button variant="ghost" size="icon" className="h-9 w-9" onClick={toggleTheme}>
-              {isDark ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+            <Button variant="ghost" size="icon" className="h-8 w-8 md:h-9 md:w-9" onClick={toggleTheme}>
+              {isDark ? <Moon className="h-3.5 w-3.5 md:h-4 md:w-4" /> : <Sun className="h-3.5 w-3.5 md:h-4 md:w-4" />}
             </Button>
-            <Button variant="ghost" size="icon" className="h-9 w-9" asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8 md:h-9 md:w-9" asChild>
               <a href="https://github.com/xandeum" target="_blank" rel="noopener noreferrer">
-                <Github className="h-4 w-4" />
+                <Github className="h-3.5 w-3.5 md:h-4 md:w-4" />
               </a>
             </Button>
-            <Button variant="ghost" size="icon" className="h-9 w-9" asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8 md:h-9 md:w-9" asChild>
               <a href="https://docs.xandeum.com" target="_blank" rel="noopener noreferrer">
-                <BookOpen className="h-4 w-4" />
+                <BookOpen className="h-3.5 w-3.5 md:h-4 md:w-4" />
               </a>
             </Button>
           </div>
@@ -222,9 +223,9 @@ export const Header = ({
               size="sm"
               onClick={onRefresh}
               disabled={isLoading}
-              className="gap-2 h-9 bg-background/50 backdrop-blur-sm hover:bg-accent hover:text-accent-foreground transition-all"
+              className="gap-1.5 md:gap-2 h-8 md:h-9 text-xs md:text-sm bg-background/50 backdrop-blur-sm hover:bg-accent hover:text-accent-foreground transition-all px-2 md:px-3"
             >
-              <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`h-3.5 w-3.5 md:h-4 md:w-4 ${isLoading ? 'animate-spin' : ''}`} />
               <span className="hidden sm:inline">Refresh</span>
             </Button>
           )}
@@ -232,11 +233,11 @@ export const Header = ({
           {/* Mobile Menu */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
-                <Menu className="h-5 w-5" />
+              <Button variant="ghost" size="icon" className="md:hidden h-8 w-8">
+                <Menu className="h-4 w-4" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[400px] pr-0">
+            <SheetContent side="right" className="w-[280px] sm:w-[350px] pr-0">
               <div className="flex flex-col gap-6 mt-6 pr-6">
                 <div className="flex flex-col gap-2">
                   <h3 className="text-sm font-medium text-muted-foreground px-2">Navigation</h3>

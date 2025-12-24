@@ -2,7 +2,7 @@ import { PNode } from '@/types/pnode';
 import { SLAMetrics } from './sla-verification';
 
 // Backend API base URL
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 export interface OptimizationSuggestion {
   id: string;

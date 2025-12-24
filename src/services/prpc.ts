@@ -150,13 +150,21 @@ class PRPCService {
     }
 
     /**
-     * Fetch all pNodes from backend API
+     * Fetch all pNodes from backend API with timeout and error handling
      */
     async getAllPNodes(): Promise<PNode[]> {
         try {
             await this.fetchCredits();
 
-            const response = await fetch(`${API_BASE_URL}/pods`);
+            // Add 30-second timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+            const response = await fetch(`${API_BASE_URL}/pods`, {
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
