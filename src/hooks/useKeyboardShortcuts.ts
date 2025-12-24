@@ -1,13 +1,19 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from './use-toast';
 
 export function useKeyboardShortcuts(onRefresh?: () => void, onSearch?: () => void) {
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       // Ignore if user is typing in an input
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        e.target instanceof HTMLSelectElement
+      ) {
         return;
       }
 
@@ -15,63 +21,119 @@ export function useKeyboardShortcuts(onRefresh?: () => void, onSearch?: () => vo
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
         onSearch?.();
-      } else if (e.key === '/') {
+        return;
+      }
+      
+      if (e.key === '/') {
         e.preventDefault();
         onSearch?.();
+        return;
       }
 
-      // R for refresh
-      else if (e.key === 'r' || e.key === 'R') {
-        e.preventDefault();
-        onRefresh?.();
+      // Navigation shortcuts with Cmd/Ctrl
+      if (e.metaKey || e.ctrlKey) {
+        switch (e.key) {
+          case '1':
+            e.preventDefault();
+            navigate('/');
+            toast({ title: '📊 Dashboard', description: 'Viewing main dashboard' });
+            break;
+          case '2':
+            e.preventDefault();
+            navigate('/nodes/inspector');
+            toast({ title: '🔍 Inspector', description: 'Viewing node inspector' });
+            break;
+          case '3':
+            e.preventDefault();
+            navigate('/advanced');
+            toast({ title: '⚡ Advanced', description: 'Viewing advanced features' });
+            break;
+          case '4':
+            e.preventDefault();
+            navigate('/intelligence');
+            toast({ title: '🧠 Intelligence', description: 'Viewing network intelligence' });
+            break;
+          case 'r':
+            e.preventDefault();
+            onRefresh?.();
+            toast({ title: '🔄 Refreshing', description: 'Fetching latest data...' });
+            break;
+        }
+        return;
       }
 
-      // G + H for home
-      else if (e.key === 'g') {
-        const nextKey = (e2: KeyboardEvent) => {
-          if (e2.key === 'h') navigate('/');
-          else if (e2.key === 'a') navigate('/advanced');
-          else if (e2.key === 'i') navigate('/intelligence');
-          else if (e2.key === 'n') navigate('/nodes/inspector');
-          window.removeEventListener('keydown', nextKey);
-        };
-        window.addEventListener('keydown', nextKey);
-        setTimeout(() => window.removeEventListener('keydown', nextKey), 2000);
-      }
+      // Single key shortcuts
+      switch (e.key) {
+        case 'r':
+        case 'R':
+          e.preventDefault();
+          onRefresh?.();
+          toast({ title: '🔄 Refreshing', description: 'Fetching latest data...' });
+          break;
 
-      // ? for help
-      else if (e.key === '?') {
-        e.preventDefault();
-        showKeyboardShortcutsHelp();
-      }
+        case '?':
+          e.preventDefault();
+          toast({
+            title: '⌨️ Keyboard Shortcuts',
+            description: (
+              <div className="text-xs space-y-2 mt-2 font-mono">
+                <div className="flex justify-between gap-4">
+                  <kbd className="px-2 py-1 bg-muted rounded text-[10px]">⌘/Ctrl + K</kbd>
+                  <span>Search nodes</span>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <kbd className="px-2 py-1 bg-muted rounded text-[10px]">⌘/Ctrl + 1-4</kbd>
+                  <span>Navigate pages</span>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <kbd className="px-2 py-1 bg-muted rounded text-[10px]">R</kbd>
+                  <span>Refresh data</span>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <kbd className="px-2 py-1 bg-muted rounded text-[10px]">?</kbd>
+                  <span>Show shortcuts</span>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <kbd className="px-2 py-1 bg-muted rounded text-[10px]">Esc</kbd>
+                  <span>Close panels</span>
+                </div>
+              </div>
+            ),
+            duration: 8000,
+          });
+          break;
 
-      // Escape to close modals/panels
-      else if (e.key === 'Escape') {
-        // This will be handled by individual components
+        case 'g':
+          // Vim-style navigation
+          const nextKey = (e2: KeyboardEvent) => {
+            e2.preventDefault();
+            switch (e2.key) {
+              case 'h':
+                navigate('/');
+                toast({ title: '📊 Dashboard' });
+                break;
+              case 'i':
+                navigate('/nodes/inspector');
+                toast({ title: '🔍 Inspector' });
+                break;
+              case 'a':
+                navigate('/advanced');
+                toast({ title: '⚡ Advanced' });
+                break;
+              case 'n':
+                navigate('/intelligence');
+                toast({ title: '🧠 Intelligence' });
+                break;
+            }
+            window.removeEventListener('keydown', nextKey);
+          };
+          window.addEventListener('keydown', nextKey);
+          setTimeout(() => window.removeEventListener('keydown', nextKey), 2000);
+          break;
       }
     };
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [navigate, onRefresh, onSearch]);
-}
-
-function showKeyboardShortcutsHelp() {
-  const shortcuts = [
-    { keys: '/', description: 'Focus search' },
-    { keys: 'Ctrl/Cmd + K', description: 'Quick search' },
-    { keys: 'R', description: 'Refresh data' },
-    { keys: 'G then H', description: 'Go to Home' },
-    { keys: 'G then A', description: 'Go to Advanced Features' },
-    { keys: 'G then I', description: 'Go to Intelligence' },
-    { keys: 'G then N', description: 'Go to Node Inspector' },
-    { keys: '?', description: 'Show this help' },
-    { keys: 'Esc', description: 'Close modals' }
-  ];
-
-  const helpText = shortcuts
-    .map(s => `${s.keys.padEnd(20)} - ${s.description}`)
-    .join('\n');
-
-  alert(`Keyboard Shortcuts:\n\n${helpText}`);
+  }, [navigate, onRefresh, onSearch, toast]);
 }

@@ -8,12 +8,6 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from 'react';
 import { PNode } from '@/types/pnode';
@@ -51,33 +45,39 @@ export const Header = ({
           onClick={() => setIsOpen(false)}
         >
           <Network className="w-4 h-4" />
-          pNodes
+          Dashboard
         </Button>
       </Link>
-
-      <div className="md:hidden space-y-1 pl-4 border-l-2 border-border/50 ml-2">
-        <div className="text-xs font-medium text-muted-foreground mb-2 px-4">Deep Dive</div>
-        <Link to="/nodes/inspector">
-          <Button
-            variant={isActive('/nodes/inspector') ? "secondary" : "ghost"}
-            className="w-full justify-start gap-2 text-sm h-9"
-            onClick={() => setIsOpen(false)}
-          >
-            <Activity className="w-4 h-4" />
-            Node Inspector
-          </Button>
-        </Link>
-        <Link to="/advanced">
-          <Button
-            variant={isActive('/advanced') ? "secondary" : "ghost"}
-            className="w-full justify-start gap-2 text-sm h-9"
-            onClick={() => setIsOpen(false)}
-          >
-            <FileCode className="w-4 h-4" />
-            Advanced Features
-          </Button>
-        </Link>
-      </div>
+      <Link to="/nodes/inspector">
+        <Button
+          variant={isActive('/nodes/inspector') ? "secondary" : "ghost"}
+          className="w-full justify-start gap-2"
+          onClick={() => setIsOpen(false)}
+        >
+          <Activity className="w-4 h-4" />
+          Inspector
+        </Button>
+      </Link>
+      <Link to="/advanced">
+        <Button
+          variant={isActive('/advanced') ? "secondary" : "ghost"}
+          className="w-full justify-start gap-2"
+          onClick={() => setIsOpen(false)}
+        >
+          <FileCode className="w-4 h-4" />
+          Advanced
+        </Button>
+      </Link>
+      <Link to="/intelligence">
+        <Button
+          variant={isActive('/intelligence') ? "secondary" : "ghost"}
+          className="w-full justify-start gap-2"
+          onClick={() => setIsOpen(false)}
+        >
+          <Brain className="w-4 h-4" />
+          Intelligence
+        </Button>
+      </Link>
     </>
   );
 
@@ -114,65 +114,104 @@ export const Header = ({
 
         {/* Right: Navigation & Actions */}
         <div className="flex items-center gap-1 md:gap-2">
-          <div className="hidden md:flex items-center gap-1">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Link to="/">
-                    <Button variant={isActive('/') ? "secondary" : "ghost"} size="icon" className="h-9 w-9">
-                      <Network className="w-4 h-4" />
-                    </Button>
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Home Dashboard</p>
-                </TooltipContent>
-              </Tooltip>
+          {/* Desktop Navigation with TEXT LABELS */}
+          <div className="hidden lg:flex items-center gap-1">
+            <Link to="/">
+              <Button 
+                variant={isActive('/') ? "secondary" : "ghost"} 
+                size="sm" 
+                className="gap-2 h-9"
+              >
+                <Network className="w-4 h-4" />
+                <span className="text-sm font-medium">Dashboard</span>
+              </Button>
+            </Link>
 
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Link to="/nodes/inspector">
-                    <Button variant={location.pathname.startsWith('/nodes') ? "secondary" : "ghost"} size="icon" className="h-9 w-9">
-                      <Activity className="w-4 h-4" />
-                    </Button>
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Node Inspector</p>
-                </TooltipContent>
-              </Tooltip>
+            <Link to="/nodes/inspector">
+              <Button 
+                variant={location.pathname.startsWith('/nodes') ? "secondary" : "ghost"} 
+                size="sm" 
+                className="gap-2 h-9"
+              >
+                <Activity className="w-4 h-4" />
+                <span className="text-sm font-medium">Inspector</span>
+              </Button>
+            </Link>
 
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Link to="/advanced">
-                    <Button variant={isActive('/advanced') ? "secondary" : "ghost"} size="icon" className="h-9 w-9">
-                      <FileCode className="w-4 h-4" />
-                    </Button>
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Advanced Features</p>
-                </TooltipContent>
-              </Tooltip>
+            <Link to="/advanced">
+              <Button 
+                variant={isActive('/advanced') ? "secondary" : "ghost"} 
+                size="sm" 
+                className="gap-2 h-9"
+              >
+                <FileCode className="w-4 h-4" />
+                <span className="text-sm font-medium">Advanced</span>
+              </Button>
+            </Link>
 
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Link to="/intelligence">
-                    <Button variant={isActive('/intelligence') ? "secondary" : "ghost"} size="icon" className="h-9 w-9">
-                      <Brain className="w-4 h-4" />
-                    </Button>
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Network Intelligence</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Link to="/intelligence">
+              <Button 
+                variant={isActive('/intelligence') ? "secondary" : "ghost"} 
+                size="sm" 
+                className="gap-2 h-9"
+              >
+                <Brain className="w-4 h-4" />
+                <span className="text-sm font-medium">Intelligence</span>
+              </Button>
+            </Link>
 
             <div className="w-px h-6 bg-border mx-1" />
 
             <ThemeToggle />
             
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-9 w-9">
+                  <Download className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => exportToCSV(nodes)}>
+                  Export Nodes (CSV)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => exportToJSON(nodes)}>
+                  Export Nodes (JSON)
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => exportSummaryToPDF(nodes)}>
+                  <span className="font-medium">Export Summary (PDF)</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => exportSummaryToJSON(nodes)}>
+                  Export Summary (JSON)
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          {/* Tablet Navigation (icons only) */}
+          <div className="hidden md:flex lg:hidden items-center gap-1">
+            <Link to="/">
+              <Button variant={isActive('/') ? "secondary" : "ghost"} size="icon" className="h-9 w-9">
+                <Network className="w-4 h-4" />
+              </Button>
+            </Link>
+            <Link to="/nodes/inspector">
+              <Button variant={location.pathname.startsWith('/nodes') ? "secondary" : "ghost"} size="icon" className="h-9 w-9">
+                <Activity className="w-4 h-4" />
+              </Button>
+            </Link>
+            <Link to="/advanced">
+              <Button variant={isActive('/advanced') ? "secondary" : "ghost"} size="icon" className="h-9 w-9">
+                <FileCode className="w-4 h-4" />
+              </Button>
+            </Link>
+            <Link to="/intelligence">
+              <Button variant={isActive('/intelligence') ? "secondary" : "ghost"} size="icon" className="h-9 w-9">
+                <Brain className="w-4 h-4" />
+              </Button>
+            </Link>
+            <div className="w-px h-6 bg-border mx-1" />
+            <ThemeToggle />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-9 w-9">
