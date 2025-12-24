@@ -4,6 +4,13 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { 
   Brain, 
   TrendingUp, 
@@ -14,7 +21,9 @@ import {
   AlertCircle,
   CheckCircle,
   ArrowRight,
-  Lightbulb
+  Lightbulb,
+  Clock,
+  Target
 } from 'lucide-react';
 import { PNode } from '@/types/pnode';
 import { rewardOptimizationEngine, OptimizationSuggestion, RewardForecast } from '@/services/reward-optimization';
@@ -29,6 +38,8 @@ export function NetworkOptimizationPanel({ nodes }: NetworkOptimizationPanelProp
   const [forecasts, setForecasts] = useState<Map<string, RewardForecast>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
   const [selectedTimeframe, setSelectedTimeframe] = useState<'1d' | '7d' | '30d' | '90d'>('30d');
+  const [selectedSuggestion, setSelectedSuggestion] = useState<OptimizationSuggestion | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
 
   useEffect(() => {
     if (nodes.length === 0) return;
@@ -236,7 +247,15 @@ export function NetworkOptimizationPanel({ nodes }: NetworkOptimizationPanelProp
                           <span className="text-muted-foreground hidden sm:inline">•</span>
                           <span className="text-muted-foreground">${suggestion.implementation.estimatedCost}</span>
                         </div>
-                        <Button size="sm" variant="outline" className="text-xs w-full sm:w-auto">
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="text-xs w-full sm:w-auto"
+                          onClick={() => {
+                            setSelectedSuggestion(suggestion);
+                            setIsDetailOpen(true);
+                          }}
+                        >
                           <span className="hidden sm:inline">View Details</span>
                           <span className="sm:hidden">Details</span>
                           <ArrowRight className="h-3 w-3 ml-1" />
@@ -329,6 +348,130 @@ export function NetworkOptimizationPanel({ nodes }: NetworkOptimizationPanelProp
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Detail Modal */}
+      <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {selectedSuggestion && getTypeIcon(selectedSuggestion.type)}
+              {selectedSuggestion?.title}
+            </DialogTitle>
+            <DialogDescription>
+              Detailed analysis and implementation guide
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedSuggestion && (
+            <div className="space-y-4">
+              {/* Priority & Type */}
+              <div className="flex items-center gap-2">
+                <Badge className={`${getPriorityColor(selectedSuggestion.priority)}`}>
+                  {selectedSuggestion.priority} priority
+                </Badge>
+                <Badge variant="outline">{selectedSuggestion.type}</Badge>
+              </div>
+
+              {/* Description */}
+              <div>
+                <h4 className="font-medium mb-2">Description</h4>
+                <p className="text-sm text-muted-foreground">{selectedSuggestion.description}</p>
+              </div>
+
+              {/* Expected Impact */}
+              <div>
+                <h4 className="font-medium mb-2">Expected Impact</h4>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3 bg-green-500/10 rounded-lg">
+                    <div className="text-xs text-muted-foreground mb-1">Reward Increase</div>
+                    <div className="text-xl font-bold text-green-500">
+                      +{selectedSuggestion.expectedImpact.rewardIncrease.toFixed(1)}%
+                    </div>
+                  </div>
+                  <div className="p-3 bg-blue-500/10 rounded-lg">
+                    <div className="text-xs text-muted-foreground mb-1">Cost Reduction</div>
+                    <div className="text-xl font-bold text-blue-500">
+                      -{selectedSuggestion.expectedImpact.costReduction.toFixed(1)}%
+                    </div>
+                  </div>
+                  <div className="p-3 bg-purple-500/10 rounded-lg">
+                    <div className="text-xs text-muted-foreground mb-1">Performance Gain</div>
+                    <div className="text-xl font-bold text-purple-500">
+                      +{selectedSuggestion.expectedImpact.performanceGain.toFixed(1)}%
+                    </div>
+                  </div>
+                  <div className="p-3 bg-yellow-500/10 rounded-lg">
+                    <div className="text-xs text-muted-foreground mb-1">Confidence</div>
+                    <div className="text-xl font-bold text-yellow-500">
+                      {selectedSuggestion.confidence}%
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Implementation Details */}
+              <div>
+                <h4 className="font-medium mb-2">Implementation</h4>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Target className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">Difficulty:</span>
+                    <span className={`font-medium ${getDifficultyColor(selectedSuggestion.implementation.difficulty)}`}>
+                      {selectedSuggestion.implementation.difficulty}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">Timeframe:</span>
+                    <span className="font-medium">{selectedSuggestion.implementation.timeframe}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <DollarSign className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">Estimated Cost:</span>
+                    <span className="font-medium">${selectedSuggestion.implementation.estimatedCost}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Implementation Steps */}
+              {selectedSuggestion.implementation.steps && selectedSuggestion.implementation.steps.length > 0 && (
+                <div>
+                  <h4 className="font-medium mb-2">Implementation Steps</h4>
+                  <ol className="space-y-2">
+                    {selectedSuggestion.implementation.steps.map((step, index) => (
+                      <li key={index} className="flex gap-2 text-sm">
+                        <span className="font-medium text-muted-foreground">{index + 1}.</span>
+                        <span>{step}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              )}
+
+              {/* Risks */}
+              {selectedSuggestion.implementation.steps && selectedSuggestion.implementation.steps.length > 1 && (
+                <div>
+                  <h4 className="font-medium mb-2 flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4 text-yellow-500" />
+                    Considerations
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    Follow the implementation steps carefully and monitor performance after each change.
+                  </p>
+                </div>
+              )}
+
+              {/* Action Button */}
+              <div className="pt-4 border-t">
+                <Button className="w-full" onClick={() => setIsDetailOpen(false)}>
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Got it, thanks!
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

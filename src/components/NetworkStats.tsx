@@ -9,9 +9,10 @@ interface NetworkStatsProps {
 export const NetworkStats = ({ nodes }: NetworkStatsProps) => {
   const activeNodes = nodes.filter(n => n.status === 'online').length;
 
-  // Calculate Network Stability (Avg Health)
-  const networkStability = nodes.length > 0
-    ? Math.round(nodes.reduce((acc, n) => acc + n.health.total, 0) / nodes.length)
+  // Calculate Network Stability (Avg Health) - handle nodes with 0 health
+  const nodesWithHealth = nodes.filter(n => n.health && n.health.total > 0);
+  const networkStability = nodesWithHealth.length > 0
+    ? Math.round(nodesWithHealth.reduce((acc, n) => acc + n.health.total, 0) / nodesWithHealth.length)
     : 0;
 
   // Calculate Total Storage (Sum of Used Storage)
@@ -124,26 +125,30 @@ export const NetworkStats = ({ nodes }: NetworkStatsProps) => {
           </CardContent>
         </Card>
       ))}
-      <Card className="lg:col-span-5 border border-border/50 shadow-premium bg-card/50 backdrop-blur-sm">
-        <CardContent className="p-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="p-2 bg-blue-500/10 rounded-lg">
-              <Globe className="h-4 w-4 text-blue-500" />
-            </div>
-            <div>
-              <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Regional Distribution</div>
-              <div className="flex gap-4 mt-1">
-                {topRegions.map(([region, count]) => (
-                  <div key={region} className="flex items-center gap-1.5">
-                    <span className="text-xs font-medium">{region}:</span>
-                    <span className="text-xs font-mono font-bold text-primary">{count}</span>
-                  </div>
-                ))}
+      <Card className="sm:col-span-2 lg:col-span-5 border border-border/50 shadow-premium bg-card/50 backdrop-blur-sm">
+        <CardContent className="p-3 md:p-4">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div className="flex items-start md:items-center gap-3">
+              <div className="p-2 bg-blue-500/10 rounded-lg flex-shrink-0">
+                <Globe className="h-4 w-4 text-blue-500" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1.5">
+                  Regional Distribution
+                </div>
+                <div className="flex flex-wrap gap-x-3 gap-y-1">
+                  {topRegions.map(([region, count]) => (
+                    <div key={region} className="flex items-center gap-1.5">
+                      <span className="text-xs md:text-sm font-medium truncate">{region}:</span>
+                      <span className="text-xs md:text-sm font-mono font-bold text-primary">{count}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-          <div className="text-[10px] text-muted-foreground italic">
-            Requirement 8: Ecosystem Health & Network Growth Visibility
+            <div className="text-[9px] md:text-[10px] text-muted-foreground italic text-left md:text-right flex-shrink-0">
+              Requirement 8: Ecosystem Health & Network Growth Visibility
+            </div>
           </div>
         </CardContent>
       </Card>

@@ -18,10 +18,8 @@ interface GlobeVisualizationProps {
 }
 
 const GlobeVisualization = ({ nodes }: GlobeVisualizationProps) => {
-    const globeEl = useRef<{ 
-      pointOfView: (pov?: Record<string, unknown>) => Record<string, unknown>; 
-      controls: () => Record<string, unknown> 
-    } | null>(null);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const globeEl = useRef<any>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
     const [geolocatedNodes, setGeolocatedNodes] = useState<PNode[]>([]);
@@ -40,10 +38,9 @@ const GlobeVisualization = ({ nodes }: GlobeVisualizationProps) => {
         updateDimensions();
         window.addEventListener('resize', updateDimensions);
 
-        // Auto-detect mobile/low performance
-        if (window.innerWidth < 768 || navigator.userAgent.includes('Mobi')) {
-            setIsLowPerformance(true);
-        }
+        // Default to 3D on mobile (2D map doesn't work well on some mobile devices)
+        // Users can still switch to 2D if they prefer
+        setIsLowPerformance(false);
 
         return () => window.removeEventListener('resize', updateDimensions);
     }, []);
@@ -74,32 +71,37 @@ const GlobeVisualization = ({ nodes }: GlobeVisualizationProps) => {
 
     return (
         <Card ref={containerRef} className="h-[300px] md:h-[500px] w-full overflow-hidden bg-black/40 backdrop-blur-md border-white/10 relative group">
-            <div className="absolute top-4 left-4 z-10 pointer-events-none">
-                <h2 className="text-xl font-black tracking-tighter text-white flex items-center gap-2">
-                    <Zap className="h-5 w-5 text-blue-500" />
-                    LIVE NETWORK MAP
+            <div className="absolute top-3 md:top-4 left-3 md:left-4 z-10 pointer-events-none">
+                <h2 className="text-base md:text-xl font-black tracking-tighter text-white flex items-center gap-1.5 md:gap-2">
+                    <Zap className="h-4 w-4 md:h-5 md:w-5 text-blue-500" />
+                    <span className="hidden sm:inline">LIVE NETWORK MAP</span>
+                    <span className="sm:hidden">NETWORK MAP</span>
                 </h2>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                <p className="text-[9px] md:text-[10px] font-bold uppercase tracking-wider md:tracking-widest text-gray-400">
                     {geolocatedNodes.length} pNodes Geolocated
                 </p>
             </div>
 
-            <div className="absolute top-4 right-4 z-10 flex gap-2">
+            <div className="absolute top-3 md:top-4 right-3 md:right-4 z-10 flex gap-1.5 md:gap-2">
                 <Button
                     variant="outline"
                     size="sm"
-                    className={`h-8 px-2 text-[10px] gap-1.5 backdrop-blur-md border-white/10 ${!isLowPerformance ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' : 'bg-black/40 text-gray-400'}`}
+                    className={`h-7 md:h-8 px-1.5 md:px-2 text-[9px] md:text-[10px] gap-1 md:gap-1.5 backdrop-blur-md border-white/10 ${!isLowPerformance ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' : 'bg-black/40 text-gray-400'}`}
                     onClick={() => setIsLowPerformance(false)}
                 >
-                    <Monitor className="h-3 w-3" /> 3D GLOBE
+                    <Monitor className="h-3 w-3" /> 
+                    <span className="hidden sm:inline">3D GLOBE</span>
+                    <span className="sm:hidden">3D</span>
                 </Button>
                 <Button
                     variant="outline"
                     size="sm"
-                    className={`h-8 px-2 text-[10px] gap-1.5 backdrop-blur-md border-white/10 ${isLowPerformance ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' : 'bg-black/40 text-gray-400'}`}
+                    className={`h-7 md:h-8 px-1.5 md:px-2 text-[9px] md:text-[10px] gap-1 md:gap-1.5 backdrop-blur-md border-white/10 ${isLowPerformance ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' : 'bg-black/40 text-gray-400'}`}
                     onClick={() => setIsLowPerformance(true)}
                 >
-                    <Smartphone className="h-3 w-3" /> 2D MAP
+                    <Smartphone className="h-3 w-3" /> 
+                    <span className="hidden sm:inline">2D MAP</span>
+                    <span className="sm:hidden">2D</span>
                 </Button>
             </div>
 

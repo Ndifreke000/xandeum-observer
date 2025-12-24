@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import BlockNodeEDA from "./pages/BlockNodeEDA";
 import AdvancedFeatures from "./pages/AdvancedFeatures";
+import Intelligence from "./pages/Intelligence";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -21,6 +22,7 @@ const App = () => (
           <Route path="/nodes/inspector" element={<BlockNodeEDA />} />
           <Route path="/nodes/eda" element={<Navigate to="/nodes/inspector" replace />} />
           <Route path="/advanced" element={<AdvancedFeatures />} />
+          <Route path="/intelligence" element={<Intelligence />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -148,7 +148,7 @@ export function ConsensusSimulator({ nodes }: ConsensusSimulatorProps) {
               leader: leader.id,
               proposal: `Block ${currentRound + 1}`,
               votes: new Map(activeNodes.map(n => [n.id, n.votes === 1])),
-              status: 'committed',
+              status: 'committed' as const,
               timestamp: Date.now()
             }].slice(-10)); // Keep last 10 rounds
             
@@ -270,29 +270,29 @@ export function ConsensusSimulator({ nodes }: ConsensusSimulatorProps) {
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="bg-muted/50 rounded-lg p-3">
-            <div className="text-xs text-muted-foreground mb-1">Round</div>
-            <div className="text-2xl font-bold">{currentRound}</div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
+          <div className="bg-muted/50 rounded-lg p-2 md:p-3">
+            <div className="text-[10px] md:text-xs text-muted-foreground mb-1">Round</div>
+            <div className="text-xl md:text-2xl font-bold">{currentRound}</div>
           </div>
-          <div className="bg-muted/50 rounded-lg p-3">
-            <div className="text-xs text-muted-foreground mb-1">Active Nodes</div>
-            <div className="text-2xl font-bold text-green-500">{stats.active}/{stats.total}</div>
+          <div className="bg-muted/50 rounded-lg p-2 md:p-3">
+            <div className="text-[10px] md:text-xs text-muted-foreground mb-1">Active Nodes</div>
+            <div className="text-xl md:text-2xl font-bold text-green-500">{stats.active}/{stats.total}</div>
           </div>
-          <div className="bg-muted/50 rounded-lg p-3">
-            <div className="text-xs text-muted-foreground mb-1">Failed Nodes</div>
-            <div className="text-2xl font-bold text-red-500">{stats.failed}</div>
+          <div className="bg-muted/50 rounded-lg p-2 md:p-3">
+            <div className="text-[10px] md:text-xs text-muted-foreground mb-1">Failed Nodes</div>
+            <div className="text-xl md:text-2xl font-bold text-red-500">{stats.failed}</div>
           </div>
-          <div className="bg-muted/50 rounded-lg p-3">
-            <div className="text-xs text-muted-foreground mb-1">Success Rate</div>
-            <div className="text-2xl font-bold text-blue-500">{stats.successRate.toFixed(0)}%</div>
+          <div className="bg-muted/50 rounded-lg p-2 md:p-3">
+            <div className="text-[10px] md:text-xs text-muted-foreground mb-1">Success Rate</div>
+            <div className="text-xl md:text-2xl font-bold text-blue-500">{stats.successRate.toFixed(0)}%</div>
           </div>
         </div>
 
         {/* Controls */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-muted/30 rounded-lg">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 p-3 md:p-4 bg-muted/30 rounded-lg">
           <div className="space-y-2">
-            <Label className="text-xs">Simulation Speed: {simulationSpeed}x</Label>
+            <Label className="text-[10px] md:text-xs">Simulation Speed: {simulationSpeed}x</Label>
             <Slider
               value={[simulationSpeed]}
               onValueChange={([value]) => setSimulationSpeed(value)}
@@ -303,7 +303,7 @@ export function ConsensusSimulator({ nodes }: ConsensusSimulatorProps) {
             />
           </div>
           <div className="space-y-2">
-            <Label className="text-xs">Failure Rate: {failureRate}%</Label>
+            <Label className="text-[10px] md:text-xs">Failure Rate: {failureRate}%</Label>
             <Slider
               value={[failureRate]}
               onValueChange={([value]) => setFailureRate(value)}
@@ -314,7 +314,7 @@ export function ConsensusSimulator({ nodes }: ConsensusSimulatorProps) {
             />
           </div>
           <div className="flex items-center justify-between">
-            <Label htmlFor="connections" className="text-xs">Show Connections</Label>
+            <Label htmlFor="connections" className="text-[10px] md:text-xs">Show Connections</Label>
             <Switch
               id="connections"
               checked={showConnections}
@@ -324,8 +324,8 @@ export function ConsensusSimulator({ nodes }: ConsensusSimulatorProps) {
         </div>
 
         {/* Visualization */}
-        <div className="relative bg-black/5 dark:bg-white/5 rounded-lg overflow-hidden" style={{ height: '300px' }}>
-          <svg width="100%" height="100%" viewBox="0 0 300 300">
+        <div className="relative bg-black/5 dark:bg-white/5 rounded-lg overflow-hidden" style={{ height: '250px', minHeight: '250px' }}>
+          <svg width="100%" height="100%" viewBox="0 0 300 300" preserveAspectRatio="xMidYMid meet">
             {/* Connections */}
             {showConnections && simulationNodes.map(node => 
               node.connections.map(connId => {
@@ -405,21 +405,21 @@ export function ConsensusSimulator({ nodes }: ConsensusSimulatorProps) {
           </svg>
 
           {/* Legend */}
-          <div className="absolute bottom-2 left-2 bg-background/90 backdrop-blur-sm rounded-lg p-2 text-xs space-y-1">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-green-500" />
+          <div className="absolute bottom-2 left-2 bg-background/90 backdrop-blur-sm rounded-lg p-1.5 md:p-2 text-[10px] md:text-xs space-y-0.5 md:space-y-1">
+            <div className="flex items-center gap-1.5 md:gap-2">
+              <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-green-500 flex-shrink-0" />
               <span>Active</span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-blue-500" />
+            <div className="flex items-center gap-1.5 md:gap-2">
+              <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-blue-500 flex-shrink-0" />
               <span>Proposing</span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-yellow-500" />
+            <div className="flex items-center gap-1.5 md:gap-2">
+              <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-yellow-500 flex-shrink-0" />
               <span>Voting</span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-red-500" />
+            <div className="flex items-center gap-1.5 md:gap-2">
+              <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-red-500 flex-shrink-0" />
               <span>Failed</span>
             </div>
           </div>
@@ -427,35 +427,35 @@ export function ConsensusSimulator({ nodes }: ConsensusSimulatorProps) {
 
         {/* Recent Consensus Rounds */}
         <div className="space-y-2">
-          <h4 className="text-sm font-medium">Recent Consensus Rounds</h4>
+          <h4 className="text-xs md:text-sm font-medium">Recent Consensus Rounds</h4>
           <div className="space-y-1 max-h-32 overflow-y-auto">
             {consensusHistory.slice().reverse().map((round, index) => (
               <div
                 key={round.round}
-                className="flex items-center justify-between p-2 bg-muted/30 rounded text-xs"
+                className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-2 bg-muted/30 rounded text-xs"
               >
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="text-xs">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Badge variant="outline" className="text-[10px] md:text-xs">
                     Round {round.round}
                   </Badge>
-                  <span className="text-muted-foreground">
+                  <span className="text-muted-foreground text-[10px] md:text-xs truncate">
                     Leader: {round.leader}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground">
+                  <span className="text-muted-foreground text-[10px] md:text-xs">
                     {round.votes.size} votes
                   </span>
                   {round.status === 'committed' ? (
-                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    <CheckCircle className="h-3 w-3 md:h-4 md:w-4 text-green-500 flex-shrink-0" />
                   ) : (
-                    <XCircle className="h-4 w-4 text-red-500" />
+                    <XCircle className="h-3 w-3 md:h-4 md:w-4 text-red-500 flex-shrink-0" />
                   )}
                 </div>
               </div>
             ))}
             {consensusHistory.length === 0 && (
-              <div className="text-center py-4 text-muted-foreground text-xs">
+              <div className="text-center py-4 text-muted-foreground text-[10px] md:text-xs">
                 No consensus rounds yet. Click Start to begin simulation.
               </div>
             )}
@@ -463,10 +463,10 @@ export function ConsensusSimulator({ nodes }: ConsensusSimulatorProps) {
         </div>
 
         {/* Info */}
-        <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+        <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-2 md:p-3">
           <div className="flex items-start gap-2">
-            <AlertTriangle className="h-4 w-4 text-blue-500 mt-0.5" />
-            <div className="text-xs space-y-1">
+            <AlertTriangle className="h-3 w-3 md:h-4 md:w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+            <div className="text-[10px] md:text-xs space-y-1">
               <p className="font-medium text-blue-500">How it works:</p>
               <p className="text-muted-foreground">
                 This simulator demonstrates Byzantine Fault Tolerant consensus similar to Xandeum's protocol. 
